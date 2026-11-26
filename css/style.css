@@ -149,3 +149,29 @@ a.item:active { background: var(--color-muted); }
   * { transition: none !important; }
   .spinner { animation-duration: 2s; }
 }
+
+/* ── 디데이 ── */
+.hero .num.word { font-size: 56px; letter-spacing: -1px; }
+.startday {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-md);
+  padding: var(--space-lg); background: var(--color-card); border: 2px solid var(--color-foreground);
+}
+.startday .d { font-size: 16px; color: var(--color-muted-foreground); }
+.startday .big { font-family: var(--font-heading); font-size: 32px; font-weight: 700; line-height: 1.2; }
+.btn.small { width: auto; min-height: 44px; padding: 8px 18px; flex: none; }
+.btn.add { margin-top: var(--space-lg); }
+.dlist { list-style: none; margin: 0; padding: 0; }
+.drow { display: flex; align-items: center; gap: var(--space-sm); min-height: 68px; padding: var(--space-sm) 0; border-bottom: 1px solid var(--color-border); }
+.drow .dmain { flex: 1; min-width: 0; }
+.drow .t { font-weight: 700; }
+.drow .d { font-size: 16px; color: var(--color-muted-foreground); }
+.drow .dleft { font-family: var(--font-heading); font-size: 24px; font-weight: 700; color: var(--color-primary); white-space: nowrap; }
+.drow .dleft.now { background: var(--color-primary); color: var(--color-on-primary); padding: 0 10px; }
+.drow .iconbtn { margin: 0 -10px 0 0; color: var(--color-muted-foreground); }
+.drow .iconbtn svg { width: 20px; height: 20px; }
+.tag { font-size: 13px; font-weight: 400; color: var(--color-primary); border: 1px solid var(--color-primary); padding: 0 6px; margin-left: 4px; vertical-align: 2px; }
+.form.inline { margin-top: var(--space-lg); padding: var(--space-lg); background: var(--color-card); border: 2px solid var(--color-foreground); }
+.form .check { display: flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 400; font-size: 19px; }
+.form .check input { width: 22px; height: 22px; min-height: 0; margin: 0; padding: 0; flex: none; accent-color: var(--color-primary); -webkit-appearance: auto; appearance: auto; }
+.btns { display: flex; gap: var(--space-sm); }
+.link.danger { color: var(--color-destructive); margin-top: var(--space-md); }

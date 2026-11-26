@@ -13,6 +13,7 @@ const ICON = {
   food:     '<path d="M7 3v8M5 3v5a2 2 0 004 0V3M7 11v10M17 3c-2 1-3 3.500-3 6.500 0 1.500 1 2.500 3 2.500zm0 9v9"/>',
   money:    '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h3"/>',
   chevron:  '<path d="M9 5l7 7-7 7"/>',
+  edit:     '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
 };
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}</svg>`;
 
@@ -29,7 +30,7 @@ const TABS = [
 // 기능을 만들 때 여기에 render 함수를 연결한다.
 const PAGES = [
   { id: 'calendar', name: '캘린더',     icon: 'calendar', desc: '우리 일정',      stage: 2 },
-  { id: 'dday',     name: '디데이',     icon: 'heart',    desc: '기념일 세기',    stage: 2, parent: '' },
+  { id: 'dday',     name: '디데이',     icon: 'heart',    desc: '기념일 세기',    stage: 2, parent: '', render: () => renderDday() },
   { id: 'diary',    name: '일기장',     icon: 'diary',    desc: '함께 쓰는 일기', stage: 2, parent: 'records' },
   { id: 'food',     name: '맛집 기록장', icon: 'food',     desc: '다녀온 맛집',    stage: 3, parent: 'records' },
   { id: 'money',    name: '가계부',     icon: 'money',    desc: '데이트 비용',    stage: 3, parent: 'records' },
@@ -82,6 +83,7 @@ function koError(err) {
   if (/Email not confirmed/i.test(m)) return '이메일 인증이 필요합니다. 받은 메일의 링크를 눌러 주세요.';
   if (/valid email|invalid format/i.test(m)) return '이메일 주소 형식을 확인해 주세요.';
   if (/rate limit/i.test(m)) return '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.';
+  if (/permission denied|does not exist|schema cache/i.test(m)) return 'DB 설정이 아직 안 된 것 같습니다. Supabase에서 SQL을 실행했는지 확인해 주세요.';
   if (/Failed to fetch|NetworkError/i.test(m)) return '인터넷 연결을 확인해 주세요.';
   return m;
 }
@@ -161,13 +163,6 @@ function renderLink() {
 }
 
 // ───────── 화면: 홈 ─────────
-// 사귄 날부터 오늘까지 며칠째인지 (사귄 날 = 1일째)
-function daysTogether(startDate) {
-  const [y, m, d] = startDate.split('-').map(Number);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  return Math.round((today - new Date(y, m - 1, d)) / 86400000) + 1;
-}
-
 function renderHome() {
   setHeader('우리', { menu: true }); setTabs('');
   const me = state.members.find(m => m.user_id === state.user.id);
@@ -185,9 +180,9 @@ function renderHome() {
       <div class="names">${esc(me?.nickname)} <i>&amp;</i> ${partner ? esc(partner.nickname) : '기다리는 중'}</div>
       ${sd
         ? `<div class="num">${daysTogether(sd)}<small>일째</small></div>
-           <div class="since">${sd.replaceAll('-', '. ')} 부터</div>`
-        : `<div class="num">우리의 날</div>
-           <div class="since">사귄 날은 디데이에서 설정할 수 있어요</div>`}
+           <div class="since">${fmtDate(parseDate(sd))} 부터<br>${nextMilestoneText(sd)}</div>`
+        : `<div class="num word">우리의 날</div>
+           <div class="since">눌러서 우리가 만난 날을 설정해 주세요</div>`}
     </a>
     <h2 class="sec">다가오는 일정</h2>
     <div class="card blank">아직 등록된 일정이 없어요</div>
@@ -234,6 +229,7 @@ function route() {
   const id = location.hash.replace('#/', '');
   const page = PAGES.find(p => p.id === id);
   if (id === 'records') renderRecords();
+  else if (page?.render) page.render();
   else if (page) renderPage(page);
   else renderHome();
   window.scrollTo(0, 0);
