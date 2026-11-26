@@ -15,3 +15,5 @@ python3 search.py "couple relationship app anniversary shared diary memory" \
   피하려고 낮췄다.
 
 `MASTER.md`, `tokens.json`, `css/tokens.css`는 도구가 만든 원본이다. 직접 고치지 않는다.
+
+- 2026-11-26: 사용자 요청으로 글꼴을 손글씨체 Gaegu로 변경 (`fonts/gaegu`, `css/fonts.css`).
