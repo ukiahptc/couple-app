@@ -1,5 +1,4 @@
 // ───────── 홈: 위젯을 세로로 쌓은 화면 ─────────
-const WEEK = ['일', '월', '화', '수', '목', '금', '토'];
 
 // 이번 달 작은 달력. marks: 기념일이 있는 날짜(숫자) 모음
 function miniCalendar(marks) {
@@ -22,13 +21,15 @@ function miniCalendar(marks) {
     </div>`;
 }
 
-// 이번 달에 걸리는 기념일 날짜들 (자동 기념일 + 직접 등록한 날)
-function marksThisMonth(rows) {
-  const t = today0(), sd = state.couple.start_date;
-  const dates = [...(sd ? autoMilestones(sd).map(x => x.date) : []), ...rows.map(nextOccurrence),
-    ...rows.filter(r => !r.repeat_yearly).map(r => parseDate(r.date))];
-  return new Set(dates.filter(d => d.getFullYear() === t.getFullYear() && d.getMonth() === t.getMonth())
-    .map(d => d.getDate()));
+// 이번 달에 일정이나 기념일이 있는 날짜들
+function marksThisMonth(annRows, events) {
+  const t = today0(), first = new Date(t.getFullYear(), t.getMonth(), 1), last = new Date(t.getFullYear(), t.getMonth() + 1, 0);
+  const anns = annsForRange(annRows, first, last);
+  const marks = new Set();
+  for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+    if (itemsOn(new Date(d), events, anns, null).length) marks.add(d.getDate());
+  }
+  return marks;
 }
 
 const widget = (page, shade, body) => `
@@ -44,7 +45,7 @@ function renderHome() {
   const P = id => PAGES.find(p => p.id === id);
   const sd = state.couple.start_date, t = today0();
 
-  const draw = rows => {
+  const draw = (annRows, events) => {
     view.innerHTML = `
       ${!partner ? `
       <section class="invite">
@@ -60,7 +61,7 @@ function renderHome() {
       ${widget(P('calendar'), '#fbcfe8', `
         <div class="wcal">
           <div class="todaytile"><span>${WEEK[t.getDay()]}요일</span><b>${t.getDate()}</b></div>
-          ${miniCalendar(marksThisMonth(rows))}
+          ${miniCalendar(marksThisMonth(annRows, events))}
         </div>`)}
 
       ${widget(P('food'), '#fecdd3', '<div class="wempty">아직 남긴 맛집이 없어요</div>')}
@@ -72,9 +73,12 @@ function renderHome() {
     if (r) r.onclick = start;
   };
 
-  draw([]);                                            // 먼저 바로 그리고
-  sb.from('anniversaries').select('date, repeat_yearly').then(({ data }) => {
+  draw([], []);                                        // 먼저 바로 그리고
+  Promise.all([
+    sb.from('anniversaries').select('title, date, repeat_yearly'),
+    sb.from('events').select('owner_id, title, start_date, start_time, end_date, repeat_rule'),
+  ]).then(([an, ev]) => {
     const onHome = !PAGES.some(p => location.hash === '#/' + p.id);
-    if (data?.length && onHome) draw(data);            // 기념일을 받아 오면 달력 표시를 채운다
+    if (onHome && (an.data?.length || ev.data?.length)) draw(an.data || [], ev.data || []);  // 받아 오면 달력 표시를 채운다
   });
 }

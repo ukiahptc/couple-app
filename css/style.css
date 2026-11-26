@@ -219,3 +219,102 @@ main { padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-xl)); }
 .invite { margin: 0 6px var(--space-lg) 0; box-shadow: 6px 6px 0 var(--color-border); }
 .btn, .form input { border-radius: 12px; }
 .chip { border-radius: 12px; }
+
+/* ── 커플 캘린더 ── */
+:root { --me: #fbcfe8; --me-bg: #fff1f6; --pt: #bfdbfe; --pt-bg: #eff6ff; --us: #fde68a; --us-bg: #fffbeb; }
+.roundbtn + .roundbtn { margin-left: var(--space-sm); }
+.calhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-sm); }
+.calhead .iconbtn { margin: 0; }
+.monthbtn { min-height: 44px; border: 0; background: none; font-size: 20px; font-weight: 800; color: var(--color-foreground); }
+.ownrow { display: flex; gap: 10px; margin: 0 4px var(--space-md) 0; }
+.ownchip {
+  flex: 1; min-height: 40px; padding: 4px 8px; border: 2px solid var(--color-foreground); border-radius: 12px;
+  background: var(--color-card); color: #64748b; font-size: 14px; font-weight: 700;
+  box-shadow: 4px 4px 0 #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ownchip.on { color: var(--color-foreground); }
+.ownchip.me.on { background: var(--me-bg); box-shadow: 4px 4px 0 var(--me); }
+.ownchip.pt.on { background: var(--pt-bg); box-shadow: 4px 4px 0 var(--pt); }
+.ownchip.us.on { background: var(--us-bg); box-shadow: 4px 4px 0 var(--us); }
+
+.calgrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0 -12px; }
+.calgrid.whead { font-size: 13px; text-align: center; color: var(--color-foreground); padding-bottom: 4px; }
+.calgrid .sun { color: #dc2626; } .calgrid .sat { color: #2563eb; }
+.cell {
+  min-height: 78px; padding: 4px 2px; border: 0; border-radius: 8px; background: none; color: var(--color-foreground);
+  display: flex; flex-direction: column; align-items: stretch; gap: 2px; font-family: inherit; overflow: hidden;
+}
+.cell .num { align-self: center; min-width: 26px; height: 24px; line-height: 24px; font-size: 15px; font-weight: 600; border-radius: 7px; text-align: center; }
+.cell.other .num { color: #cbd5e1; }
+.cell.other .evchip { opacity: .6; }
+.cell.today .num { background: var(--color-foreground); color: #fff; }
+.cell.sel { background: #eee6ec; }
+.evchip {
+  display: block; font-size: 10.500px; line-height: 16px; height: 16px; padding: 0 3px; border-radius: 4px;
+  white-space: nowrap; overflow: hidden; text-align: left; color: var(--color-foreground);
+}
+.evchip.me { background: var(--me-bg); box-shadow: inset 3px 0 0 var(--me); }
+.evchip.pt { background: var(--pt-bg); box-shadow: inset 3px 0 0 var(--pt); }
+.evchip.us { background: var(--us-bg); box-shadow: inset 3px 0 0 var(--us); }
+.cell .more { font-size: 10px; color: var(--color-muted-foreground); text-align: center; line-height: 12px; }
+
+.daytitle { margin: var(--space-lg) 0 var(--space-md); font-size: 18px; font-weight: 800; }
+.evcard {
+  display: flex; align-items: center; gap: var(--space-md); width: calc(100% - 6px); min-height: 60px; text-align: left;
+  padding: 12px 16px; margin-bottom: var(--space-md); font-family: inherit; color: var(--color-foreground);
+  border: 2px solid var(--color-foreground); border-radius: 16px;
+}
+.evcard.me { background: var(--me-bg); box-shadow: 5px 5px 0 var(--me); }
+.evcard.pt { background: var(--pt-bg); box-shadow: 5px 5px 0 var(--pt); }
+.evcard.us { background: var(--us-bg); box-shadow: 5px 5px 0 var(--us); }
+.evtime { flex: none; min-width: 74px; font-size: 14px; }
+.evtime small { display: block; font-size: 11px; color: var(--color-muted-foreground); }
+.evtitle { font-size: 17px; font-weight: 700; overflow-wrap: anywhere; }
+
+/* ── 아래에서 올라오는 시트 ── */
+.noscroll { overflow: hidden; }
+.sheet { position: fixed; inset: 0; z-index: 50; background: rgba(15, 23, 42, .35); display: flex; align-items: flex-end; }
+.sheetbody {
+  width: 100%; max-width: 560px; max-height: 94%; margin: 0 auto; overflow-y: auto;
+  background: var(--color-card); border-radius: 28px 28px 0 0;
+  padding: var(--space-md) var(--space-lg) calc(env(safe-area-inset-bottom) + var(--space-xl));
+  animation: sheetup .25s ease-out;
+}
+@keyframes sheetup { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheethead { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); }
+.sheethead b { font-size: 17px; }
+.sheethead .roundbtn { margin: 0; }
+.roundbtn.ok { color: #2563eb; }
+.sheetbody .titleinput { margin: 0 0 var(--space-md); border-width: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.rowline { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); min-height: 52px; margin: 0; font-size: 16px; font-weight: 400; }
+.form .rowline { font-size: 16px; font-weight: 400; margin-bottom: 0; }
+.rowline span { display: flex; gap: 6px; }
+.form .rowline input[type=date], .form .rowline input[type=time], .form .rowline select {
+  width: auto; min-height: 40px; margin: 0; padding: 6px 12px; border: 0; border-radius: 12px; background: #eef0f3;
+  font-size: 16px; font-family: inherit; color: var(--color-foreground);
+}
+.form .switch {
+  -webkit-appearance: none; appearance: none; width: 50px; min-height: 0; height: 28px; margin: 0; padding: 0; flex: none;
+  border: 2px solid var(--color-foreground); border-radius: 14px; background: var(--color-card); position: relative;
+  transition: background-color .2s ease-out;
+}
+.form .switch::after {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--color-foreground); transition: transform .2s ease-out;
+}
+.form .switch:checked { background: var(--color-primary); }
+.form .switch:checked::after { transform: translateX(22px); background: #fff; }
+.sheetbody textarea {
+  display: block; width: 100%; margin: var(--space-md) 0; padding: 12px 14px; resize: vertical;
+  border: 2px solid var(--color-foreground); border-radius: 12px; background: var(--color-card);
+  font-size: 16px; font-family: inherit; color: var(--color-foreground);
+}
+@media (prefers-reduced-motion: reduce) { .sheetbody { animation: none; } }
+
+/* 상단: 제목이 남는 폭을 차지하고 버튼은 오른쪽에 붙는다 */
+.topbar h1 { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar .roundbtn, .topbar .textbtn { margin-left: var(--space-sm); }
+.form label.rowline, .form .rowline { display: flex; white-space: nowrap; }
+.form .rowline input[type=date], .form .rowline input[type=time] { padding: 6px 8px; min-width: 0; }
+.rowline span { min-width: 0; }

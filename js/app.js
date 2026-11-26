@@ -14,6 +14,9 @@ const ICON = {
   money:    '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h3"/>',
   chevron:  '<path d="M9 5l7 7-7 7"/>',
   gear:     '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>',
+  back:     '<path d="M15 5l-7 7 7 7"/>',
+  close:    '<path d="M6 6l12 12M18 6L6 18"/>',
+  check:    '<path d="M5 12.500l4.500 4.500L19 7.500"/>',
   plus:     '<path d="M12 5v14M5 12h14"/>',
   edit:     '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
 };
@@ -23,7 +26,7 @@ const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}<
 // 기능을 만들 때 여기에 render 함수를 연결한다.
 const PAGES = [
   { id: 'dday',     name: '디데이',     icon: 'heart',    stage: 2, render: () => renderDday() },
-  { id: 'calendar', name: '캘린더',     icon: 'calendar', stage: 2 },
+  { id: 'calendar', name: '커플 캘린더', icon: 'calendar', stage: 2, render: () => renderCalendar() },
   { id: 'diary',    name: '커플 일기장', icon: 'diary',    stage: 2 },
   { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3 },
   { id: 'money',    name: '가계부',     icon: 'money',    stage: 3 },
@@ -40,16 +43,24 @@ const title = document.getElementById('pageTitle');
 const backBtn = document.getElementById('backBtn');
 const menuBtn = document.getElementById('menuBtn');
 const gearBtn = document.getElementById('gearBtn');
+const actionBtn = document.getElementById('actionBtn');
 
 // 사용자가 입력한 글자를 화면에 넣을 때 태그로 해석되지 않게 한다
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-function setHeader(text, { back = false, menu = false, gear = false } = {}) {
+// action: 오른쪽 위 둥근 버튼 하나 { icon, label, onClick }
+function setHeader(text, { back = false, menu = false, gear = false, action = null } = {}) {
   title.textContent = text;
   backBtn.hidden = !back;
   menuBtn.hidden = !menu;
   gearBtn.hidden = !gear;
+  actionBtn.hidden = !action;
+  if (action) {
+    actionBtn.innerHTML = icon(action.icon);
+    actionBtn.setAttribute('aria-label', action.label);
+    actionBtn.onclick = action.onClick;
+  }
   backBtn.onclick = () => { location.hash = '#/'; };
 }
 
@@ -189,6 +200,8 @@ function renderMessage(text) {
 // 주소의 # 뒤를 보고 화면을 바꾼다. 커플 연결이 끝난 뒤에만 동작한다.
 function route() {
   if (!state.couple) return;
+  document.querySelectorAll('.sheet').forEach(el => el.remove());
+  document.body.classList.remove('noscroll');
   const id = location.hash.replace('#/', '');
   const page = PAGES.find(p => p.id === id);
   if (page?.render) page.render();
