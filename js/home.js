@@ -45,7 +45,7 @@ function renderHome() {
   const P = id => PAGES.find(p => p.id === id);
   const sd = state.couple.start_date, t = today0();
 
-  const draw = ({ anns = [], events = [], diaries = [] } = {}) => {
+  const draw = ({ anns = [], events = [], diaries = [], money = null } = {}) => {
     view.innerHTML = `
       ${!partner ? `
       <section class="invite">
@@ -73,8 +73,10 @@ function renderHome() {
           <b>${esc(r.title)}</b>${r.body ? `<p class="dprev">${esc(r.body)}</p>` : ''}</div>`;
       }).join('') : '<div class="wempty">아직 쓴 일기가 없어요</div>')}
 
-      ${widget(P('money'), '#fde68a', '<div class="wempty">아직 적은 내역이 없어요</div>')}
-      ${widget(P('map'), '#bae6fd', '<div class="wempty">아직 표시한 장소가 없어요</div>')}
+      ${widget(P('money'), '#bae6fd', money
+        ? `<div class="wsub">이번 달 데이트 지출</div><div class="wnum small">${won(monthTotal(money))}</div>`
+        : '<div class="wempty">아직 적은 내역이 없어요</div>')}
+      ${widget(P('map'), '#fde68a', '<div class="wempty">아직 표시한 장소가 없어요</div>')}
       ${widget(P('album'), '#e9d5ff', '<div class="wempty">아직 올린 사진이 없어요</div>')}`;
     const r = document.getElementById('refreshBtn');
     if (r) r.onclick = start;
@@ -86,9 +88,10 @@ function renderHome() {
     sb.from('events').select('owner_id, title, start_date, start_time, end_date, repeat_rule'),
     sb.from('diaries').select('author_id, title, body, entry_date, entry_time')
       .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }).limit(2),
-  ]).then(([an, ev, di]) => {
+    sb.from('money_dates').select('start_date, money_expenses(amount)'),
+  ]).then(([an, ev, di, mo]) => {
     const onHome = ['', '#', '#/'].includes(location.hash);
     // 받아 온 내용으로 달력 표시와 최근 일기를 채운다
-    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [] });
+    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null });
   });
 }
