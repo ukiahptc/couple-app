@@ -181,16 +181,12 @@ function renderHome() {
   view.innerHTML = `
     ${waiting}
     <a class="hero" href="#/dday">
-      <div class="avatars">
-        <span>${esc((me?.nickname || '나')[0])}</span>
-        ${partner ? `<span>${esc(partner.nickname[0])}</span>` : '<span class="empty-av">?</span>'}
-      </div>
-      <div class="names">${esc(me?.nickname)}${icon('heart')}${partner ? esc(partner.nickname) : '기다리는 중'}</div>
+      <div class="names">${esc(me?.nickname)} <i>&amp;</i> ${partner ? esc(partner.nickname) : '기다리는 중'}</div>
       ${sd
-        ? `<div class="num">${daysTogether(sd)}일째</div>
-           <div class="since">${sd.replaceAll('-', '. ')} 부터 함께</div>`
+        ? `<div class="num">${daysTogether(sd)}<small>일째</small></div>
+           <div class="since">${sd.replaceAll('-', '. ')} 부터</div>`
         : `<div class="num">우리의 날</div>
-           <div class="since">사귄 날은 디데이에서 설정할 수 있어요 (2단계)</div>`}
+           <div class="since">사귄 날은 디데이에서 설정할 수 있어요</div>`}
     </a>
     <h2 class="sec">다가오는 일정</h2>
     <div class="card blank">아직 등록된 일정이 없어요</div>
