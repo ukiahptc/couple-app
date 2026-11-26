@@ -175,3 +175,47 @@ a.item:active { background: var(--color-muted); }
 .form .check input { width: 22px; height: 22px; min-height: 0; margin: 0; padding: 0; flex: none; accent-color: var(--color-primary); -webkit-appearance: auto; appearance: auto; }
 .btns { display: flex; gap: var(--space-sm); }
 .link.danger { color: var(--color-destructive); margin-top: var(--space-md); }
+
+/* ── 홈 위젯: 굵은 테두리 + 뒤로 비치는 색 면 ── */
+.roundbtn {
+  margin-left: auto; width: 44px; height: 44px; flex: none; border-radius: 50%;
+  background: var(--color-card); border: 1.5px solid var(--color-foreground); color: var(--color-foreground);
+  display: flex; align-items: center; justify-content: center;
+}
+.roundbtn svg { width: 22px; height: 22px; stroke-linecap: round; }
+main { padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-xl)); }
+.widget {
+  display: block; text-decoration: none; color: inherit;
+  background: var(--color-card); border: 2px solid var(--color-foreground); border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--shade, var(--color-border));
+  padding: var(--space-md) var(--space-md) var(--space-lg); margin: 0 6px var(--space-lg) 0;
+  transition: transform .15s ease-out, box-shadow .15s ease-out;
+}
+.widget:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--shade, var(--color-border)); }
+.wtitle { display: flex; align-items: center; gap: var(--space-sm); font-weight: 700; font-size: 17px; }
+.wtitle svg { width: 20px; height: 20px; color: var(--color-primary); }
+.wnum { font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin-top: var(--space-sm); }
+.wsub { font-size: 14px; color: var(--color-muted-foreground); }
+.wempty { font-size: 14px; color: var(--color-muted-foreground); margin-top: var(--space-sm); }
+.wcal { display: flex; gap: var(--space-md); align-items: stretch; margin-top: var(--space-sm); }
+.todaytile {
+  flex: 0 0 38%; min-height: 132px; border-radius: 12px; padding: 12px;
+  background: var(--color-primary); color: var(--color-on-primary);
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.todaytile span { font-size: 14px; font-weight: 600; }
+.todaytile b { font-size: 48px; font-weight: 800; line-height: 1; }
+.mcal { flex: 1; min-width: 0; }
+.mtitle { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
+.mgrid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 12px; font-weight: 600; }
+.mgrid span { height: 22px; line-height: 22px; }
+.mgrid .sun { color: #dc2626; } .mgrid .sat { color: #2563eb; }
+.mgrid .mark { background: #fbcfe8; border-radius: 50%; color: var(--color-primary); }
+.mgrid .today { background: var(--color-foreground); color: #fff; border-radius: 50%; }
+.mgrid span.mark, .mgrid span.today { width: 22px; margin: 0 auto; }
+
+/* 위젯 모양에 맞춰 다른 상자들도 모서리를 조금 둥글린다 */
+.invite, .startday, .form.inline { border-radius: 18px; }
+.invite { margin: 0 6px var(--space-lg) 0; box-shadow: 6px 6px 0 var(--color-border); }
+.btn, .form input { border-radius: 12px; }
+.chip { border-radius: 12px; }

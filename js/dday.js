@@ -48,8 +48,7 @@ function nextMilestoneText(startISO) {
 }
 
 async function renderDday() {
-  setHeader('디데이', { back: true }); setTabs('');
-  backBtn.onclick = () => { location.hash = '#/'; };
+  setHeader('디데이', { back: true });
   view.innerHTML = '<div class="spinner" role="status" aria-label="불러오는 중"></div>';
 
   const { data: rows, error } = await sb.from('anniversaries')

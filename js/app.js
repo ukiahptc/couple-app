@@ -13,29 +13,23 @@ const ICON = {
   food:     '<path d="M7 3v8M5 3v5a2 2 0 004 0V3M7 11v10M17 3c-2 1-3 3.500-3 6.500 0 1.500 1 2.500 3 2.500zm0 9v9"/>',
   money:    '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h3"/>',
   chevron:  '<path d="M9 5l7 7-7 7"/>',
+  gear:     '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.600 5.600l2.100 2.100M16.300 16.300l2.100 2.100M5.600 18.400l2.100-2.100M16.300 7.700l2.100-2.100"/>',
+  plus:     '<path d="M12 5v14M5 12h14"/>',
   edit:     '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
 };
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}</svg>`;
 
-// 아래 탭 메뉴 (최대 5개)
-const TABS = [
-  { id: '',         name: '홈',     icon: 'home' },
-  { id: 'calendar', name: '캘린더', icon: 'calendar' },
-  { id: 'records',  name: '기록',   icon: 'records' },
-  { id: 'map',      name: '지도',   icon: 'map' },
-  { id: 'album',    name: '앨범',   icon: 'album' },
-];
-
-// 화면 정의: parent가 있으면 그 탭 안의 하위 화면이다.
+// 화면 정의. 홈의 위젯을 누르면 각 화면으로 들어가고, 뒤로 버튼으로 홈에 돌아온다.
 // 기능을 만들 때 여기에 render 함수를 연결한다.
 const PAGES = [
-  { id: 'calendar', name: '캘린더',     icon: 'calendar', desc: '우리 일정',      stage: 2 },
-  { id: 'dday',     name: '디데이',     icon: 'heart',    desc: '기념일 세기',    stage: 2, parent: '', render: () => renderDday() },
-  { id: 'diary',    name: '일기장',     icon: 'diary',    desc: '함께 쓰는 일기', stage: 2, parent: 'records' },
-  { id: 'food',     name: '맛집 기록장', icon: 'food',     desc: '다녀온 맛집',    stage: 3, parent: 'records' },
-  { id: 'money',    name: '가계부',     icon: 'money',    desc: '데이트 비용',    stage: 3, parent: 'records' },
-  { id: 'map',      name: '데이트 지도', icon: 'map',      desc: '우리가 간 곳',   stage: 3 },
-  { id: 'album',    name: '사진 앨범',   icon: 'album',    desc: '추억 모아 보기', stage: 4 },
+  { id: 'dday',     name: '디데이',     icon: 'heart',    stage: 2, render: () => renderDday() },
+  { id: 'calendar', name: '캘린더',     icon: 'calendar', stage: 2 },
+  { id: 'diary',    name: '커플 일기장', icon: 'diary',    stage: 2 },
+  { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3 },
+  { id: 'money',    name: '가계부',     icon: 'money',    stage: 3 },
+  { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3 },
+  { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4 },
+  { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings() },
 ];
 
 // 앱 상태: 로그인한 사용자, 내 커플, 커플 멤버 목록
@@ -45,27 +39,22 @@ const view = document.getElementById('view');
 const title = document.getElementById('pageTitle');
 const backBtn = document.getElementById('backBtn');
 const menuBtn = document.getElementById('menuBtn');
-const tabbar = document.getElementById('tabbar');
+const gearBtn = document.getElementById('gearBtn');
 
 // 사용자가 입력한 글자를 화면에 넣을 때 태그로 해석되지 않게 한다
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-function setHeader(text, { back = false, menu = false } = {}) {
+function setHeader(text, { back = false, menu = false, gear = false } = {}) {
   title.textContent = text;
   backBtn.hidden = !back;
   menuBtn.hidden = !menu;
+  gearBtn.hidden = !gear;
+  backBtn.onclick = () => { location.hash = '#/'; };
 }
 
-// 아래 탭을 그린다. active가 null이면 탭을 숨긴다 (로그인, 커플 연결 화면).
-function setTabs(active) {
-  tabbar.hidden = active === null;
-  if (active === null) return;
-  tabbar.innerHTML = TABS.map(t => `
-    <a href="#/${t.id}" ${t.id === active ? 'aria-current="page"' : ''}>
-      ${icon(t.icon)}<span>${t.name}</span>
-    </a>`).join('');
-}
+// 예전 아래 탭 메뉴의 흔적. 지금은 홈 위젯으로 이동하므로 아무 일도 하지 않는다.
+function setTabs() {}
 
 const BRAND = `
   <div class="brand">
@@ -162,57 +151,31 @@ function renderLink() {
   };
 }
 
-// ───────── 화면: 홈 ─────────
-function renderHome() {
-  setHeader('우리', { menu: true }); setTabs('');
-  const me = state.members.find(m => m.user_id === state.user.id);
-  const partner = state.members.find(m => m.user_id !== state.user.id);
-  const sd = state.couple.start_date;
-  const waiting = !partner ? `
-    <section class="card invite">
-      <div class="label">상대방에게 이 초대 코드를 알려 주세요</div>
-      <div class="code">${esc(state.couple.invite_code)}</div>
-      <button class="link" id="refreshBtn">상대방이 입력했어요. 새로고침</button>
-    </section>` : '';
-  view.innerHTML = `
-    ${waiting}
-    <a class="hero" href="#/dday">
-      <div class="names">${esc(me?.nickname)} <i>&amp;</i> ${partner ? esc(partner.nickname) : '기다리는 중'}</div>
-      ${sd
-        ? `<div class="num">${daysTogether(sd)}<small>일째</small></div>
-           <div class="since">${fmtDate(parseDate(sd))} 부터<br>${nextMilestoneText(sd)}</div>`
-        : `<div class="num word">우리의 날</div>
-           <div class="since">눌러서 우리가 만난 날을 설정해 주세요</div>`}
-    </a>
-    <h2 class="sec">다가오는 일정</h2>
-    <div class="card blank">아직 등록된 일정이 없어요</div>
-    <h2 class="sec">최근 기록</h2>
-    <div class="card blank">아직 남긴 기록이 없어요</div>`;
-  const r = document.getElementById('refreshBtn');
-  if (r) r.onclick = start;
-}
-
-// 기록 탭: 일기장, 맛집, 가계부로 들어가는 목록
-function renderRecords() {
-  setHeader('기록', {}); setTabs('records');
-  view.innerHTML = PAGES.filter(p => p.parent === 'records').map(p => `
-    <a class="card item" href="#/${p.id}">
-      <div class="chip">${icon(p.icon)}</div>
-      <div><div class="t">${p.name}</div><div class="d">${p.desc}</div></div>
-      <div class="go">${icon('chevron')}</div>
-    </a>`).join('');
-}
-
+// ───────── 화면: 아직 안 만든 기능 ─────────
 function renderPage(page) {
-  const sub = page.parent !== undefined;           // 하위 화면이면 뒤로 버튼
-  setHeader(page.name, { back: sub }); setTabs(sub ? page.parent : page.id);
-  backBtn.onclick = () => { location.hash = '#/' + (page.parent || ''); };
+  setHeader(page.name, { back: true });
   view.innerHTML = `
     <div class="empty">
       <div class="chip">${icon(page.icon)}</div>
       <b>${page.name}</b>
       <p>${page.stage}단계에서 만들어집니다.</p>
     </div>`;
+}
+
+// ───────── 화면: 설정 ─────────
+function renderSettings() {
+  setHeader('설정', { back: true });
+  const me = state.members.find(m => m.user_id === state.user.id);
+  const partner = state.members.find(m => m.user_id !== state.user.id);
+  view.innerHTML = `
+    <ul class="dlist">
+      <li class="drow"><div class="dmain"><div class="d">내 닉네임</div><div class="t">${esc(me?.nickname)}</div></div></li>
+      <li class="drow"><div class="dmain"><div class="d">상대방</div><div class="t">${partner ? esc(partner.nickname) : '아직 연결되지 않았어요'}</div></div></li>
+      <li class="drow"><div class="dmain"><div class="d">초대 코드</div><div class="t">${esc(state.couple.invite_code)}</div></div></li>
+      <li class="drow"><div class="dmain"><div class="d">로그인 계정</div><div class="t">${esc(state.user.email)}</div></div></li>
+    </ul>
+    <button class="btn ghost add" id="logoutBtn">로그아웃</button>`;
+  document.getElementById('logoutBtn').onclick = logout;
 }
 
 function renderMessage(text) {
@@ -228,8 +191,7 @@ function route() {
   if (!state.couple) return;
   const id = location.hash.replace('#/', '');
   const page = PAGES.find(p => p.id === id);
-  if (id === 'records') renderRecords();
-  else if (page?.render) page.render();
+  if (page?.render) page.render();
   else if (page) renderPage(page);
   else renderHome();
   window.scrollTo(0, 0);
@@ -257,12 +219,13 @@ async function start() {
   route();
 }
 
-menuBtn.addEventListener('click', async () => {
+async function logout() {
   if (!confirm('로그아웃할까요?')) return;
   await sb.auth.signOut();
   location.hash = '';
   start();
-});
+}
+menuBtn.addEventListener('click', logout);
 window.addEventListener('hashchange', route);
 start();
 
