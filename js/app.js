@@ -112,13 +112,14 @@ function renderAuth(mode = 'login') {
     btn.disabled = true; btn.textContent = '잠시만요…'; msg.textContent = '';
     const { data, error } = isLogin
       ? await sb.auth.signInWithPassword(cred)
-      : await sb.auth.signUp(cred);
+      // 인증 메일의 링크를 누르면 이 앱 주소로 돌아오게 한다
+      : await sb.auth.signUp({ ...cred, options: { emailRedirectTo: location.origin + location.pathname } });
     btn.disabled = false; btn.textContent = isLogin ? '로그인' : '가입하기';
     if (error) { msg.textContent = koError(error); return; }
     // 이메일 인증이 켜져 있으면 가입 직후에는 세션이 없다
     if (!data.session) {
       msg.className = 'msg ok';
-      msg.textContent = '인증 메일을 보냈습니다. 메일의 링크를 누른 뒤 로그인해 주세요.';
+      msg.textContent = '인증 메일을 보냈습니다. 메일의 링크를 누른 뒤, 이 앱으로 돌아와 로그인해 주세요.';
       return;
     }
     start();

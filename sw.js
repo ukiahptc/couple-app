@@ -1,5 +1,5 @@
 // 파일을 수정해 배포할 때마다 이 버전 숫자를 올리면 새 파일이 적용된다.
-const CACHE = 'couple-app-v3';
+const CACHE = 'couple-app-v4';
 const FILES = ['./', 'index.html', 'css/style.css', 'js/app.js', 'js/config.js', 'js/vendor/supabase.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 
 self.addEventListener('install', e => {
