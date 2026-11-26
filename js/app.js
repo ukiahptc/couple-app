@@ -17,6 +17,7 @@ const ICON = {
   back:     '<path d="M15 5l-7 7 7 7"/>',
   close:    '<path d="M6 6l12 12M18 6L6 18"/>',
   check:    '<path d="M5 12.500l4.500 4.500L19 7.500"/>',
+  comment:  '<path d="M5 5h14a1 1 0 011 1v9a1 1 0 01-1 1h-7l-4 4v-4H5a1 1 0 01-1-1V6a1 1 0 011-1z"/>',
   plus:     '<path d="M12 5v14M5 12h14"/>',
   edit:     '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
 };
@@ -27,7 +28,7 @@ const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}<
 const PAGES = [
   { id: 'dday',     name: '디데이',     icon: 'heart',    stage: 2, render: () => renderDday() },
   { id: 'calendar', name: '커플 캘린더', icon: 'calendar', stage: 2, render: () => renderCalendar() },
-  { id: 'diary',    name: '커플 일기장', icon: 'diary',    stage: 2 },
+  { id: 'diary',    name: '커플 일기장', icon: 'diary',    stage: 2, render: param => renderDiary(param) },
   { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3 },
   { id: 'money',    name: '가계부',     icon: 'money',    stage: 3 },
   { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3 },
@@ -202,9 +203,10 @@ function route() {
   if (!state.couple) return;
   document.querySelectorAll('.sheet').forEach(el => el.remove());
   document.body.classList.remove('noscroll');
-  const id = location.hash.replace('#/', '');
+  // '#/diary/글번호' 처럼 뒤에 붙은 값은 param으로 넘긴다
+  const [id, param] = location.hash.replace('#/', '').split('/');
   const page = PAGES.find(p => p.id === id);
-  if (page?.render) page.render();
+  if (page?.render) page.render(param);
   else if (page) renderPage(page);
   else renderHome();
   window.scrollTo(0, 0);

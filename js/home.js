@@ -45,7 +45,7 @@ function renderHome() {
   const P = id => PAGES.find(p => p.id === id);
   const sd = state.couple.start_date, t = today0();
 
-  const draw = (annRows, events) => {
+  const draw = ({ anns = [], events = [], diaries = [] } = {}) => {
     view.innerHTML = `
       ${!partner ? `
       <section class="invite">
@@ -61,11 +61,18 @@ function renderHome() {
       ${widget(P('calendar'), '#fbcfe8', `
         <div class="wcal">
           <div class="todaytile"><span>${WEEK[t.getDay()]}요일</span><b>${t.getDate()}</b></div>
-          ${miniCalendar(marksThisMonth(annRows, events))}
+          ${miniCalendar(marksThisMonth(anns, events))}
         </div>`)}
 
       ${widget(P('food'), '#fecdd3', '<div class="wempty">아직 남긴 맛집이 없어요</div>')}
-      ${widget(P('diary'), '#bbf7d0', '<div class="wempty">아직 쓴 일기가 없어요</div>')}
+
+      ${widget(P('diary'), '#bbf7d0', diaries.length ? diaries.map(r => {
+        const d = parseDate(r.entry_date), ago = diffDays(t, d);
+        const when = ago === 0 ? '오늘' : ago === 1 ? '어제' : `${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEK[d.getDay()]}요일`;
+        return `<div class="wdiary"><div class="dmeta">${whoTag(r.author_id)} · ${when}</div>
+          <b>${esc(r.title)}</b>${r.body ? `<p class="dprev">${esc(r.body)}</p>` : ''}</div>`;
+      }).join('') : '<div class="wempty">아직 쓴 일기가 없어요</div>')}
+
       ${widget(P('money'), '#fde68a', '<div class="wempty">아직 적은 내역이 없어요</div>')}
       ${widget(P('map'), '#bae6fd', '<div class="wempty">아직 표시한 장소가 없어요</div>')}
       ${widget(P('album'), '#e9d5ff', '<div class="wempty">아직 올린 사진이 없어요</div>')}`;
@@ -73,12 +80,15 @@ function renderHome() {
     if (r) r.onclick = start;
   };
 
-  draw([], []);                                        // 먼저 바로 그리고
+  draw();                                              // 먼저 바로 그리고
   Promise.all([
     sb.from('anniversaries').select('title, date, repeat_yearly'),
     sb.from('events').select('owner_id, title, start_date, start_time, end_date, repeat_rule'),
-  ]).then(([an, ev]) => {
-    const onHome = !PAGES.some(p => location.hash === '#/' + p.id);
-    if (onHome && (an.data?.length || ev.data?.length)) draw(an.data || [], ev.data || []);  // 받아 오면 달력 표시를 채운다
+    sb.from('diaries').select('author_id, title, body, entry_date, entry_time')
+      .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }).limit(2),
+  ]).then(([an, ev, di]) => {
+    const onHome = ['', '#', '#/'].includes(location.hash);
+    // 받아 온 내용으로 달력 표시와 최근 일기를 채운다
+    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [] });
   });
 }
