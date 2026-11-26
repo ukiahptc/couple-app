@@ -1,0 +1,41 @@
+/* Design Tokens - Auto-generated */
+/* Do not edit directly - modify tokens.json instead */
+
+/* === PRIMITIVES === */
+:root {
+
+}
+
+/* === SEMANTIC === */
+:root {
+  --color-primary: #BE185D;
+  --color-on-primary: #FFFFFF;
+  --color-secondary: #EC4899;
+  --color-on-secondary: #000000;
+  --color-accent: #DC2626;
+  --color-on-accent: #FFFFFF;
+  --color-background: #FDF2F8;
+  --color-foreground: #0F172A;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0F172A;
+  --color-muted: #FBF1F5;
+  --color-muted-foreground: #475569;
+  --color-border: #F7E3EB;
+  --color-destructive: #DC2626;
+  --color-on-destructive: #FFFFFF;
+  --color-ring: #BE185D;
+  --font-heading: "Baloo 2", sans-serif;
+  --font-body: "Comic Neue", sans-serif;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+}
+
+/* === COMPONENTS === */
+:root {
+
+}

@@ -69,6 +69,7 @@ function setTabs(active) {
 const BRAND = `
   <div class="brand">
     <div class="logo">${icon('heart')}</div>
+    <div class="word">우리</div>
     <p>둘만의 일정과 기록을 한곳에</p>
   </div>`;
 
