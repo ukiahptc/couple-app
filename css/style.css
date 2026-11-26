@@ -40,3 +40,30 @@ main { padding: 4px 16px calc(env(safe-area-inset-bottom) + 24px); max-width: 56
 .empty { text-align: center; color: var(--sub); padding: 72px 16px; }
 .empty .emoji { font-size: 48px; }
 .empty p { margin: 12px 0 0; line-height: 1.6; }
+
+/* ── 로그인 / 커플 연결 ── */
+.menu { margin-left: auto; border: 0; background: none; color: var(--sub); font-size: 14px; cursor: pointer; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px 18px; margin-bottom: 16px; }
+.form h2 { margin: 0 0 16px; font-size: 20px; }
+.form label { display: block; font-size: 13px; color: var(--sub); margin-bottom: 12px; }
+.form input {
+  display: block; width: 100%; margin-top: 6px; padding: 13px 12px;
+  border: 1px solid var(--line); border-radius: 12px; background: #fff;
+  font-size: 16px; color: var(--ink); font-family: inherit;
+}
+.form input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.btn {
+  display: block; width: 100%; padding: 14px; border: 0; border-radius: 14px;
+  background: var(--accent); color: #fff; font-size: 16px; font-weight: 700;
+  font-family: inherit; cursor: pointer;
+}
+.btn:disabled { opacity: .5; }
+.btn.ghost { background: none; color: var(--accent); border: 1.5px solid var(--accent); }
+.link { display: block; width: 100%; margin-top: 12px; border: 0; background: none; color: var(--sub); font-size: 14px; font-family: inherit; text-decoration: underline; cursor: pointer; }
+.msg { min-height: 20px; margin: 0 0 10px; font-size: 13px; color: #c0392b; line-height: 1.5; }
+.msg.ok { color: #2e7d57; }
+.or { text-align: center; color: var(--sub); font-size: 13px; margin: 16px 0; }
+.invite { text-align: center; }
+.invite .label { font-size: 13px; color: var(--sub); }
+.invite .code { font-size: 34px; font-weight: 800; letter-spacing: 6px; margin-top: 8px; color: var(--accent); }
+.empty .btn { width: auto; margin: 16px auto 0; padding: 10px 20px; }
