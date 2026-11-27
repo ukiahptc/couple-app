@@ -41,12 +41,19 @@ const widget = (page, shade, body) => `
 function renderHome() {
   const me = state.members.find(m => m.user_id === state.user.id);
   const partner = state.members.find(m => m.user_id !== state.user.id);
-  setHeader(partner ? `${me?.nickname} & ${partner.nickname}` : (me?.nickname || '우리'), { gear: true });
+  setHeader(partner ? `${me?.nickname} ♡ ${partner.nickname}` : (me?.nickname || '우리'), { gear: true });
   const P = id => PAGES.find(p => p.id === id);
   const sd = state.couple.start_date, t = today0();
 
-  const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], purls = {}, trips = [], album = [], aurls = {} } = {}) => {
+  document.body.classList.add('paper');
+  const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], trips = [], album = [], aurls = {} } = {}) => {
+    const todays = itemsOn(t, events, annsForRange(anns, t, t), null);
+    const di = diaries[0], pl = places[0], shot = album[0];
+    const ago = d => { const n = diffDays(t, parseDate(d)); return n === 0 ? '오늘' : n === 1 ? '어제' : `${parseDate(d).getMonth() + 1}월 ${parseDate(d).getDate()}일`; };
+    const who = id => esc(state.members.find(x => x.user_id === id)?.nickname || '');
+    const row = (href, left, right) => `<a class="hli" href="${href}"><span>${left}</span><small>${right}</small></a>`;
     view.innerHTML = `
+      <div class="hdate">${t.getMonth() + 1}월 ${t.getDate()}일 ${WEEK[t.getDay()]}요일</div>
       ${!partner ? `
       <section class="invite">
         <div class="label">상대방에게 이 초대 코드를 알려 주세요</div>
@@ -54,36 +61,27 @@ function renderHome() {
         <button class="link" id="refreshBtn">상대방이 입력했어요. 새로고침</button>
       </section>` : ''}
 
-      ${widget(P('dday'), '#ddd6fe', sd
-        ? `<div class="wnum">D+${daysTogether(sd)}</div><div class="wsub">${nextMilestoneText(sd)}</div>`
-        : `<div class="wempty">눌러서 우리가 만난 날을 설정해 주세요</div>`)}
+      <div class="htop ${shot && aurls[shot.thumb] ? '' : 'solo'}">
+        <a class="hnote" href="#/dday"><i class="tape"></i>
+          ${sd ? `<p>우리가 만난 지</p><b>${daysTogether(sd)}일</b><p>${esc(nextMilestoneText(sd).replace('다음 기념일 ', ''))}</p>`
+            : `<p>우리가 만난 날을</p><b>언제?</b><p>눌러서 알려 주세요</p>`}</a>
+        ${shot && aurls[shot.thumb] ? `<a class="hpol" href="#/album" aria-label="사진 앨범"><img src="${esc(aurls[shot.thumb])}" alt=""><span>${esc(shot.caption || ago(shot.taken_date))}</span></a>` : ''}
+      </div>
 
-      ${widget(P('calendar'), '#fbcfe8', `
-        <div class="wcal">
-          <div class="todaytile"><span>${WEEK[t.getDay()]}요일</span><b>${t.getDate()}</b></div>
-          ${miniCalendar(marksThisMonth(anns, events))}
-        </div>`)}
+      <h2 class="hmark">오늘</h2>
+      ${todays.length ? todays.map(x => row('#/calendar', esc(x.title), x.kind === 'ann' ? '기념일' : x.time ? fmtTime(x.time) : '하루 종일')).join('')
+        : row('#/calendar', '오늘은 일정이 없어요', '캘린더 보기')}
 
-      ${widget(P('food'), '#fecdd3', places.length ? `<div class="wfood">${places.map(p => `
-        <div class="wplace"><span class="fphoto">${purls[p.photos[0]] ? `<img src="${esc(purls[p.photos[0]])}" alt="">` : `<span class="fnone">${foodEmoji(p.category)}</span>`}</span>
-          <b>${esc(p.name)}</b></div>`).join('')}</div>` : '<div class="wempty">아직 남긴 맛집이 없어요</div>')}
+      <h2 class="hmark green">요즘 우리</h2>
+      ${row('#/diary', di ? `일기 · ${esc(di.title)}` : '일기 · 아직 없어요', di ? `${ago(di.entry_date)}, ${who(di.author_id)}` : '쓰러 가기')}
+      ${row('#/food', pl ? `맛집 · ${esc(pl.name)}` : '맛집 · 아직 없어요', pl ? (pl.rating ? '★'.repeat(pl.rating) : esc(pl.category)) : '남기러 가기')}
+      ${row('#/money', '이번 달 데이트 지출', money ? won(monthTotal(money)) : '0원')}
+      ${row('#/map', '함께 가 본 곳', `${new Set(trips.map(x => x.region_code)).size}곳`)}
 
-      ${widget(P('diary'), '#bbf7d0', diaries.length ? diaries.map(r => {
-        const d = parseDate(r.entry_date), ago = diffDays(t, d);
-        const when = ago === 0 ? '오늘' : ago === 1 ? '어제' : `${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEK[d.getDay()]}요일`;
-        return `<div class="wdiary"><div class="dmeta">${whoTag(r.author_id)} · ${when}</div>
-          <b>${esc(r.title)}</b>${r.body ? `<p class="dprev">${esc(r.body)}</p>` : ''}</div>`;
-      }).join('') : '<div class="wempty">아직 쓴 일기가 없어요</div>')}
-
-      ${widget(P('money'), '#bae6fd', money
-        ? `<div class="wsub">이번 달 데이트 지출</div><div class="wnum small">${won(monthTotal(money))}</div>`
-        : '<div class="wempty">아직 적은 내역이 없어요</div>')}
-      ${widget(P('map'), '#fde68a', trips.length
-        ? `<div class="wsub">함께 가 본 지역</div><div class="wnum small">${new Set(trips.map(x => x.region_code)).size}곳</div>`
-        : '<div class="wempty">아직 표시한 장소가 없어요</div>')}
-      ${widget(P('album'), '#e9d5ff', album.length
-        ? `<div class="walbum">${album.map(x => `<span class="athumb">${aurls[x.thumb] ? `<img src="${esc(aurls[x.thumb])}" alt="">` : ''}</span>`).join('')}</div>`
-        : '<div class="wempty">아직 올린 사진이 없어요</div>')}`;
+      <nav class="hstk" aria-label="메뉴">
+        ${[['calendar', '📅', '캘린더'], ['diary', '📔', '일기'], ['food', '🍴', '맛집'], ['money', '💳', '가계부'], ['map', '🗺️', '지도'], ['album', '📷', '앨범']]
+          .map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${e}</b>${n}</a>`).join('')}
+      </nav>`;
     const r = document.getElementById('refreshBtn');
     if (r) r.onclick = start;
   };
@@ -93,18 +91,17 @@ function renderHome() {
     sb.from('anniversaries').select('title, date, repeat_yearly'),
     sb.from('events').select('owner_id, title, start_date, start_time, end_date, repeat_rule'),
     sb.from('diaries').select('author_id, title, body, entry_date, entry_time')
-      .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }).limit(2),
+      .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }).limit(1),
     sb.from('money_dates').select('start_date, money_expenses(amount)'),
-    sb.from('places').select('name, category, photos').order('visit_date', { ascending: false }).order('created_at', { ascending: false }).limit(3),
+    sb.from('places').select('name, category, rating').order('visit_date', { ascending: false }).order('created_at', { ascending: false }).limit(1),
     sb.from('trips').select('region_code'),
-    sb.from('album_photos').select('thumb').order('taken_date', { ascending: false }).order('created_at', { ascending: false }).limit(4),
+    sb.from('album_photos').select('thumb, caption, taken_date').order('taken_date', { ascending: false }).order('created_at', { ascending: false }).limit(1),
   ]).then(async ([an, ev, di, mo, pl, tr, al]) => {
     const album = al.data || [];
     const aurls = await photoUrls(album.map(x => x.thumb)).catch(() => ({}));
     const places = pl.data || [];
-    const purls = await photoUrls(places.map(p => p.photos[0]).filter(Boolean)).catch(() => ({}));
     const onHome = ['', '#', '#/'].includes(location.hash);
     // 받아 온 내용으로 달력 표시와 최근 일기를 채운다
-    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null, places, purls, trips: tr.data || [], album, aurls });
+    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null, places, trips: tr.data || [], album, aurls });
   });
 }

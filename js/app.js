@@ -200,6 +200,7 @@ function renderMessage(text) {
 // ───────── 라우터 ─────────
 // 주소의 # 뒤를 보고 화면을 바꾼다. 커플 연결이 끝난 뒤에만 동작한다.
 function route() {
+  document.body.classList.remove('paper');   // 홈에서만 모눈종이 바탕을 쓴다 (renderHome 이 다시 붙인다)
   if (!state.couple) return;
   document.querySelectorAll('.sheet').forEach(el => el.remove());
   document.body.classList.remove('noscroll');
