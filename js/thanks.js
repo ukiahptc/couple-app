@@ -155,7 +155,7 @@ async function thanksImage(ws, rows) {
   c.strokeStyle = '#f1eee4'; c.lineWidth = 2;
   for (let x = 0; x <= W; x += 54) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
   for (let y = 0; y <= H; y += 54) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
-  c.fillStyle = '#fff3b8'; c.fillRect(48, 70, W - 96, H - 130);
+  c.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--memo').trim() || '#fff3b8'; c.fillRect(48, 70, W - 96, H - 130);
   c.save(); c.translate(W / 2, 70); c.rotate(-.03); c.fillStyle = 'rgba(240,150,170,.7)'; c.fillRect(-150, -26, 300, 54); c.restore();
   c.fillStyle = '#3b342c'; c.textBaseline = 'top';
   c.font = '700 76px Gaegu, "Gowun Dodum", sans-serif'; c.fillText('우리가 감사한 것들', PAD, 150);

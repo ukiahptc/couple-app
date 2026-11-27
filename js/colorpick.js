@@ -122,3 +122,21 @@ function setTheme(hex) {
   applyTheme(hex);
 }
 applyTheme(themeColor());
+
+// 메모지 색: 노란 메모지(만난 날, 통독 현황, 성경책 칸 등)의 종이 색. 글씨가 보이도록 어두운 색은 밝게 올려 쓴다.
+const MEMO_DEFAULT = '#fff3b8';
+const memoColor = () => { try { const c = localStorage.getItem('memoColor'); return cpValid(c) ? c : ''; } catch (e) { return ''; } };
+function memoShade(hex) {
+  const [r, g, b] = cpRgb(hex).map(x => x / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  if (l >= .78) return hex;
+  return cpHsl(cpToHsv(r * 255, g * 255, b * 255)[0], d ? d / (1 - Math.abs(2 * l - 1)) : 0, .86);
+}
+function applyMemo(hex) {
+  const st = document.documentElement.style;
+  if (cpValid(hex)) st.setProperty('--memo', memoShade(hex)); else st.removeProperty('--memo');
+}
+function setMemo(hex) {
+  try { if (cpValid(hex)) localStorage.setItem('memoColor', hex); else localStorage.removeItem('memoColor'); } catch (e) { /* 저장 공간을 못 쓰는 경우는 넘어간다 */ }
+  applyMemo(hex);
+}
+applyMemo(memoColor());
