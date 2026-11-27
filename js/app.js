@@ -239,11 +239,17 @@ function renderSettings() {
       <li class="drow"><div class="dmain"><div class="d">상대방</div><div class="t">${partner ? esc(partner.nickname) : '아직 연결되지 않았어요'}</div></div></li>
       <li class="drow"><div class="dmain"><div class="d">초대 코드</div><div class="t">${esc(state.couple.invite_code)}</div></div></li>
       <li class="drow"><div class="dmain"><div class="d">로그인 계정</div><div class="t">${esc(state.user.email)}</div></div></li>
+      <li class="drow"><div class="dmain"><div class="d">테마 색 <small>(이 휴대폰에만 적용)</small></div>
+        <div class="themerow"><button class="cpsw" id="themePick" style="--c:var(--theme)" aria-label="테마 색 고르기"></button>
+          <button class="txt" id="themePick2">🎨 색 고르기</button>${themeColor() ? '<button class="txt" id="themeReset">기본 색으로</button>' : ''}</div></div></li>
       <li class="drow" id="pushRow"></li>
     </ul>
     <button class="btn ghost add" id="logoutBtn">로그아웃</button>`;
   document.getElementById('logoutBtn').onclick = logout;
   drawPushRow(document.getElementById('pushRow'));
+  view.querySelectorAll('#themePick, #themePick2').forEach(b => { b.onclick = () => openColorPicker({ value: themeColor() || THEME_DEFAULT, onDone: c => { setTheme(c); renderSettings(); } }); });
+  const themeReset = document.getElementById('themeReset');
+  if (themeReset) themeReset.onclick = () => { setTheme(''); renderSettings(); };
 }
 
 function renderMessage(text) {

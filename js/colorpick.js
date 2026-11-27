@@ -95,3 +95,30 @@ function openColorPicker({ value, onDone }) {
   tab(CP_PRESETS.includes(hex()) || !cpValid(value) ? 'std' : 'custom');
   paint();
 }
+
+// ───────── 테마 색 ─────────
+// 고른 색 하나에서 세 가지를 만든다: 형광펜·선택 표시(theme), 버튼(soft), 진한 강조(deep).
+// 글씨가 묻히지 않게, 어두운 색을 고르면 같은 계열의 밝은 색으로 올려서 쓴다. 이 기기에만 저장한다.
+const THEME_DEFAULT = '#ffd0dc';
+function cpHsl(hh, s, l) {   // h: 0~360, s·l: 0~1 → '#rrggbb'
+  const a = s * Math.min(l, 1 - l), f = n => { const k = (n + hh / 30) % 12; return (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))) * 255; };
+  return cpHex(f(0), f(8), f(4));
+}
+function themeShades(hex) {
+  const [r, g, b] = cpRgb(hex).map(x => x / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  const s = d ? d / (1 - Math.abs(2 * l - 1)) : 0, h = cpToHsv(r * 255, g * 255, b * 255)[0];
+  const keep = l >= .75 && l <= .93, tl = keep ? l : l < .75 ? .88 : .93;   // 너무 어둡거나 너무 흰 색은 형광펜으로 보이는 밝기로 맞춘다
+  return { theme: keep ? hex : cpHsl(h, s, tl), soft: cpHsl(h, s, Math.min(.96, tl + .03)), deep: cpHsl(h, Math.min(s, .6), .48), tape: cpHsl(h, Math.min(s, .75), .76) + 'a6' };
+}
+const themeColor = () => { try { const c = localStorage.getItem('themeColor'); return cpValid(c) ? c : ''; } catch (e) { return ''; } };
+function applyTheme(hex) {
+  const st = document.documentElement.style;
+  if (!cpValid(hex)) { ['--theme', '--theme-soft', '--theme-deep', '--theme-tape'].forEach(k => st.removeProperty(k)); return; }
+  const t = themeShades(hex);
+  st.setProperty('--theme', t.theme); st.setProperty('--theme-soft', t.soft); st.setProperty('--theme-deep', t.deep); st.setProperty('--theme-tape', t.tape);
+}
+function setTheme(hex) {
+  try { if (cpValid(hex)) localStorage.setItem('themeColor', hex); else localStorage.removeItem('themeColor'); } catch (e) { /* 저장 공간을 못 쓰는 경우는 넘어간다 */ }
+  applyTheme(hex);
+}
+applyTheme(themeColor());
