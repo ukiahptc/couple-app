@@ -82,12 +82,7 @@ function renderHome() {
       ${coming.length ? coming.map(({ x, d, n }) => row('#/calendar',
           `<i class="odot ${x.key}"></i>${n === 0 ? '오늘' : n === 1 ? '내일' : `${d.getMonth() + 1}월 ${d.getDate()}일(${WEEK[d.getDay()]})`} · ${esc(x.title)}`,
           `${esc(names[x.key] || '')}${x.kind === 'ann' ? ' · 기념일' : x.time ? ' · ' + fmtTime(x.time) : ''}`)).join('')
-        : row('#/calendar', '한 달 안에 잡힌 일정이 없어요', '캘린더 보기')}
-
-      <nav class="hstk" aria-label="메뉴">
-        ${[['calendar', '📅', '캘린더'], ['diary', '📔', '일기'], ['food', '🍴', '맛집'], ['money', '💳', '가계부'], ['map', '🗺️', '지도'], ['album', '📷', '앨범'], ['bible', '📖', '통독'], ['qt', '🕊️', 'QT'], ['ask', '💬', '질문']]
-          .map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${e}</b>${n}</a>`).join('')}
-      </nav>`;
+        : row('#/calendar', '한 달 안에 잡힌 일정이 없어요', '캘린더 보기')}`;
     fillVerse(document.getElementById('hverse'));
     const r = document.getElementById('refreshBtn');
     if (r) r.onclick = start;

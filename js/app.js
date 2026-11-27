@@ -26,18 +26,20 @@ const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}<
 // 화면 정의. 홈의 위젯을 누르면 각 화면으로 들어가고, 뒤로 버튼으로 홈에 돌아온다.
 // 기능을 만들 때 여기에 render 함수를 연결한다.
 const PAGES = [
-  { id: 'dday',     name: '디데이',     icon: 'heart',    stage: 2, render: () => renderDday() },
-  { id: 'calendar', name: '커플 캘린더', icon: 'calendar', stage: 2, render: () => renderCalendar() },
-  { id: 'diary',    name: '커플 일기장', icon: 'diary',    stage: 2, render: param => renderDiary(param) },
-  { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3, render: param => renderFood(param) },
-  { id: 'money',    name: '데이트 가계부', icon: 'money',  stage: 3, render: param => renderMoney(param) },
-  { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3, render: param => renderMap(param) },
-  { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4, render: () => renderAlbum() },
-  { id: 'bible',    name: '성경 통독표', icon: 'records',  stage: 5, render: param => renderBible(param) },
-  { id: 'qt',       name: 'QT 나눔',    icon: 'diary',    stage: 5, render: param => renderQt(param) },
-  { id: 'ask',      name: '오늘의 질문', icon: 'comment',  stage: 5, render: () => renderAsk() },
-  { id: 'grow',     name: '성경책 키우기', icon: 'records', stage: 5, render: () => renderGrow() },
-  { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings() },
+  { id: 'dday',     name: '디데이',     icon: 'heart',    stage: 2, render: () => renderDday(), tab: '' },
+  { id: 'calendar', name: '커플 캘린더', icon: 'calendar', stage: 2, render: () => renderCalendar(), tab: 'us' },
+  { id: 'diary',    name: '커플 일기장', icon: 'diary',    stage: 2, render: param => renderDiary(param), tab: 'us' },
+  { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3, render: param => renderFood(param), tab: 'us' },
+  { id: 'money',    name: '데이트 가계부', icon: 'money',  stage: 3, render: param => renderMoney(param), tab: 'us' },
+  { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3, render: param => renderMap(param), tab: 'us' },
+  { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4, render: () => renderAlbum(), tab: 'us' },
+  { id: 'bible',    name: '성경 통독표', icon: 'records',  stage: 5, render: param => renderBible(param), tab: 'faith' },
+  { id: 'qt',       name: 'QT 나눔',    icon: 'diary',    stage: 5, render: param => renderQt(param), tab: 'faith' },
+  { id: 'ask',      name: '오늘의 질문', icon: 'comment',  stage: 5, render: () => renderAsk(), tab: 'faith' },
+  { id: 'grow',     name: '성경책 키우기', icon: 'records', stage: 5, render: () => renderGrow(), tab: 'faith' },
+  { id: 'us',       name: '우리',       icon: 'heart',    tab: 'us',    render: () => renderUsHub() },
+  { id: 'faith',    name: '믿음',       icon: 'records',  tab: 'faith', render: () => renderFaithHub() },
+  { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings(), tab: '' },
 ];
 
 // 앱 상태: 로그인한 사용자, 내 커플, 커플 멤버 목록
@@ -66,11 +68,54 @@ function setHeader(text, { back = false, menu = false, gear = false, action = nu
     actionBtn.setAttribute('aria-label', action.label);
     actionBtn.onclick = action.onClick;
   }
-  backBtn.onclick = () => { location.hash = '#/'; };
+  backBtn.onclick = () => { location.hash = '#/' + curTab; };   // 뒤로: 그 화면이 속한 탭으로
 }
 
-// 예전 아래 탭 메뉴의 흔적. 지금은 홈 위젯으로 이동하므로 아무 일도 하지 않는다.
-function setTabs() {}
+// 아래 탭 메뉴. tab: ''(홈) | 'us'(우리) | 'faith'(믿음). null 이면 탭을 숨긴다(로그인·커플 연결 화면).
+let curTab = '';
+const tabbar = document.getElementById('tabbar');
+function setTabs(tab) {
+  tabbar.hidden = tab === null;
+  document.body.classList.toggle('hastabs', tab !== null);
+  if (tab === null) return;
+  curTab = tab;
+  tabbar.querySelectorAll('a').forEach(a => {
+    a.getAttribute('href') === '#/' + tab ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current');
+  });
+}
+
+// 탭 화면에 놓는 스티커 메뉴
+const stickers = list => `<nav class="hstk big" aria-label="메뉴">${list.map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${e}</b>${n}</a>`).join('')}</nav>`;
+
+// '우리' 탭: 둘의 일정과 기록
+function renderUsHub() {
+  setHeader('우리');
+  view.innerHTML = `
+    <p class="hubline">둘이 함께 쌓아 가는 일정과 기록이에요.</p>
+    ${stickers([['calendar', '📅', '캘린더'], ['diary', '📔', '일기'], ['food', '🍴', '맛집'], ['money', '💳', '가계부'], ['map', '🗺️', '지도'], ['album', '📷', '앨범']])}`;
+}
+
+// '믿음' 탭: 오늘 할 일과 신앙 기록
+async function renderFaithHub() {
+  setHeader('믿음');
+  const today = toISO(today0());
+  const draw = (asked, read) => {
+    view.innerHTML = `
+      ${growWidget(growCache)}
+      <h2 class="hmark green">오늘</h2>
+      <a class="hli" href="#/ask"><span>${asked == null ? '💬 오늘의 질문' : asked ? '✅ 오늘의 질문에 답했어요' : '💬 오늘의 질문에 아직 답하지 않았어요'}</span><small>›</small></a>
+      <a class="hli" href="#/bible"><span>${read == null ? '📖 성경 통독' : read ? `✅ 오늘 ${read}장 읽었어요` : '📖 오늘은 아직 읽지 않았어요'}</span><small>›</small></a>
+      ${stickers([['ask', '💬', '질문'], ['qt', '🕊️', 'QT'], ['bible', '📖', '통독'], ['grow', '⭐', '성경책']])}`;
+  };
+  draw(null, null);
+  const n = q => q.then(r => (r.error ? null : r.count || 0), () => null);
+  const [asked, read] = await Promise.all([
+    n(sb.from('qt_answers').select('id', { count: 'exact', head: true }).eq('q_date', today).eq('user_id', state.user.id)),
+    n(sb.from('bible_reads').select('id', { count: 'exact', head: true }).eq('read_date', today).eq('user_id', state.user.id)),
+    growPoints(),
+  ]);
+  if (location.hash === '#/faith') draw(asked, read);
+}
 
 const BRAND = `
   <div class="brand">
@@ -213,6 +258,7 @@ function route() {
   // '#/diary/글번호' 처럼 뒤에 붙은 값은 param으로 넘긴다
   const [id, param] = location.hash.replace('#/', '').split('/');
   const page = PAGES.find(p => p.id === id);
+  setTabs(page ? page.tab || '' : '');
   if (page?.render) page.render(param);
   else if (page) renderPage(page);
   else renderHome();

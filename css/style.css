@@ -807,3 +807,18 @@ body.paper { font-synthesis: none; }
 .grow small { margin-left: 4px; color: #8a7f70; }
 .grow b { font-weight: 400; white-space: nowrap; }
 .qcard.today { margin-top: 18px; }
+
+/* ───────── 아래 탭 3개 (홈 · 우리 · 믿음) ───────── */
+body.paper .tabbar { background: #fffdf6; border-top: 2px solid var(--ink); }
+body.paper .tabbar a { gap: 0; font-family: var(--font-heading); font-size: 17px; color: #8a7f70; }
+.tabbar a b { font-size: 21px; font-weight: 400; line-height: 1.2; font-family: "Apple Color Emoji", "Noto Color Emoji", sans-serif; filter: grayscale(1); opacity: .6; }
+body.paper .tabbar a[aria-current="page"] { color: var(--ink); font-weight: 700; background: linear-gradient(transparent 62%, #ffd0dc 62%, #ffd0dc 88%, transparent 88%); }
+.tabbar a[aria-current="page"] b { filter: none; opacity: 1; }
+body.hastabs main { padding-bottom: calc(env(safe-area-inset-bottom) + var(--tab-h) + var(--space-xl)); }
+body.hastabs .bottombar { bottom: calc(env(safe-area-inset-bottom) + var(--tab-h)); padding-bottom: var(--space-sm); }
+body.hastabs main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bottom) + var(--tab-h) + 100px); }
+.hubline { margin: 14px 0 0; font-size: 15px; color: #8a7f70; }
+.hstk a:nth-child(4n+1):nth-child(n+7) { background: #ffe4c9; }
+.hstk.big { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+.hstk.big a { padding: 22px 0 16px; font-family: var(--font-heading); font-size: 24px; }
+.hstk.big b { font-size: 40px; }
