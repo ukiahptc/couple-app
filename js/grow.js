@@ -15,7 +15,7 @@ const GROW_STAGES = [
 function growSvg(stage) {
   const ink = '#3b342c';
   const face = (cx, cy, k = 1) => `
-    <circle cx="${cx - 11 * k}" cy="${cy}" r="${2.6 * k}" fill="${ink}"/><circle cx="${cx + 11 * k}" cy="${cy}" r="${2.6 * k}" fill="${ink}"/>
+    <circle class="gb-eye" cx="${cx - 11 * k}" cy="${cy}" r="${2.6 * k}" fill="${ink}"/><circle class="gb-eye" cx="${cx + 11 * k}" cy="${cy}" r="${2.6 * k}" fill="${ink}"/>
     <path d="M${cx - 6 * k} ${cy + 8 * k}q${6 * k} ${6 * k} ${12 * k} 0" fill="none" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>
     <ellipse cx="${cx - 19 * k}" cy="${cy + 7 * k}" rx="${4 * k}" ry="${2.6 * k}" fill="#ffb3c4"/><ellipse cx="${cx + 19 * k}" cy="${cy + 7 * k}" rx="${4 * k}" ry="${2.6 * k}" fill="#ffb3c4"/>`;
   let art;
@@ -40,8 +40,12 @@ function growSvg(stage) {
       ${face(105, y + h * .5 + Math.min(46, h * .42) / 2 - 8, .85)}`;
   }
   return `<svg viewBox="0 0 200 180" role="img" aria-label="${GROW_STAGES[stage].name}">
-    <ellipse cx="102" cy="162" rx="62" ry="7" fill="rgba(59,52,44,.12)"/>
-    ${art}
+    <ellipse class="gb-shadow" cx="102" cy="164" rx="56" ry="7" fill="rgba(59,52,44,.12)"/>
+    <g class="gb">
+      <ellipse class="gb-foot l" cx="84" cy="153" rx="11" ry="6.500" fill="#fffdf2" stroke="${ink}" stroke-width="2.200"/>
+      <ellipse class="gb-foot r" cx="118" cy="153" rx="11" ry="6.500" fill="#fffdf2" stroke="${ink}" stroke-width="2.200"/>
+      <g class="gb-body">${art}</g>
+    </g>
   </svg>`;
 }
 
@@ -77,24 +81,69 @@ const growBar = g => {
     <p class="seednext">⭐ ${g.points.toLocaleString('ko-KR')}점${nx ? ` · ${nx.name}까지 ${(nx.need - g.points).toLocaleString('ko-KR')}점` : ' · 다 자랐어요'}</p>`;
 };
 
-// 홈에 놓는 작은 카드
+// 살아 움직이는 성경책: 숨 쉬고, 눈을 깜빡이고, 좌우로 걸어 다니고, 누르면 뛰면서 말을 한다.
+const PET_LINES = ['오늘도 같이 읽어요!', '기록할수록 내가 커져요', '오늘의 질문 답했어요?', '말씀 한 구절 어때요?', '둘이 함께라 좋아요', '쑥쑥 자라는 중!', '간지러워요 ㅎㅎ', '오늘 감사한 일은요?', '통독 한 장만 더!'];
 function growWidget(g) {
-  if (!g) return '<a class="hgrow" href="#/grow"><div class="seedinfo"><small>우리 성경책</small><b>…</b></div></a>';
+  if (!g) return '<section class="pet"><div class="petfield"></div></section>';
   return `
-    <a class="hgrow" href="#/grow" aria-label="성경책 키우기">
-      <div class="seedart">${growSvg(g.stage)}</div>
-      <div class="seedinfo"><small>우리 성경책 · ${g.stage + 1}단계</small><b>${GROW_STAGES[g.stage].name}</b>${growBar(g)}</div>
-    </a>`;
+    <section class="pet">
+      <div class="petfield">
+        <div class="petbubble" hidden></div>
+        <button class="petchar" type="button" aria-label="성경책 쓰다듬기"><span class="petflip">${growSvg(g.stage)}</span></button>
+      </div>
+      <a class="petinfo seedinfo" href="#/grow" aria-label="성경책 키우기 자세히">
+        <small>우리 성경책 · ${g.stage + 1}단계</small><b>${GROW_STAGES[g.stage].name}</b>${growBar(g)}
+      </a>
+    </section>`;
+}
+let petTimer = 0;
+// box 안에 성경책을 그리고 움직이기 시작한다. 화면이 바뀌면 스스로 멈춘다.
+function mountPet(box, g) {
+  if (!box) return;
+  clearTimeout(petTimer);
+  box.innerHTML = growWidget(g);
+  const field = box.querySelector('.petfield'), ch = box.querySelector('.petchar'), bubble = box.querySelector('.petbubble');
+  if (!ch) return;
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let x = 0;
+  const place = nx => {
+    ch.classList.toggle('left', nx < x);
+    x = nx;
+    field.style.setProperty('--px', x + 'px');
+  };
+  const wander = () => {
+    if (!ch.isConnected) return;
+    const range = Math.max(0, (field.clientWidth - ch.clientWidth) / 2 - 6);
+    place(Math.round((Math.random() * 2 - 1) * range));
+    ch.classList.add('walk');
+    setTimeout(() => ch.classList.remove('walk'), 1700);
+    petTimer = setTimeout(wander, 3200 + Math.random() * 3000);
+  };
+  if (!calm) petTimer = setTimeout(wander, 1200);
+  let hide = 0;
+  ch.onclick = () => {
+    ch.classList.remove('jump'); void ch.offsetWidth; ch.classList.add('jump');
+    bubble.textContent = PET_LINES[Math.floor(Math.random() * PET_LINES.length)];
+    bubble.hidden = false;
+    clearTimeout(hide); hide = setTimeout(() => { bubble.hidden = true; }, 2200);
+    for (let i = 0; i < 5; i++) {
+      const p = document.createElement('i');
+      p.className = 'petpop';
+      p.textContent = ['⭐', '💛', '✨', '💗'][Math.floor(Math.random() * 4)];
+      p.style.setProperty('--dx', Math.round(Math.random() * 120 - 60) + 'px');
+      p.style.animationDelay = i * 60 + 'ms';
+      field.appendChild(p);
+      setTimeout(() => p.remove(), 1300);
+    }
+  };
 }
 
 async function renderGrow() {
   setHeader('성경책 키우기', { back: true });
   const draw = g => {
     view.innerHTML = `
-      <section class="seed big">
-        <div class="seedart">${growSvg(g.stage)}</div>
-        <div class="seedinfo"><small>우리 성경책 · ${g.stage + 1}단계</small><b>${GROW_STAGES[g.stage].name}</b><p>${GROW_STAGES[g.stage].line}</p>${growBar(g)}</div>
-      </section>
+      <div id="gpet"></div>
+      <p class="hubline">${GROW_STAGES[g.stage].line}. 성경책을 눌러 보세요.</p>
 
       <h2 class="hmark green">자라는 단계</h2>
       <div class="gstages">${GROW_STAGES.map((s, i) => `
@@ -104,6 +153,7 @@ async function renderGrow() {
       <p class="hint">둘이 남긴 기록을 모두 합쳐서 세요. 기록을 지우면 그만큼 줄어들어요.</p>
       ${g.items.map(x => `<div class="grow"><span>${x.name} <small>${x.pts}점</small></span><b>${x.n.toLocaleString('ko-KR')}개 · ${(x.n * x.pts).toLocaleString('ko-KR')}점</b></div>`).join('')}
       <div class="grow"><span>질문에 둘 다 답한 날 <small>${BOTH_BONUS}점 더</small></span><b>${g.both}일 · ${g.both * BOTH_BONUS}점</b></div>`;
+    mountPet(document.getElementById('gpet'), g);
   };
   if (growCache) draw(growCache); else view.innerHTML = '<div class="spinner" role="status" aria-label="불러오는 중"></div>';
   const g = await growPoints();

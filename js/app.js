@@ -101,11 +101,12 @@ async function renderFaithHub() {
   const today = toISO(today0());
   const draw = (asked, read) => {
     view.innerHTML = `
-      ${growWidget(growCache)}
+      <div id="fgrow"></div>
       <h2 class="hmark green">오늘</h2>
       <a class="hli" href="#/ask"><span>${asked == null ? '💬 오늘의 질문' : asked ? '✅ 오늘의 질문에 답했어요' : '💬 오늘의 질문에 아직 답하지 않았어요'}</span><small>›</small></a>
       <a class="hli" href="#/bible"><span>${read == null ? '📖 성경 통독' : read ? `✅ 오늘 ${read}장 읽었어요` : '📖 오늘은 아직 읽지 않았어요'}</span><small>›</small></a>
       ${stickers([['ask', '💬', '질문'], ['qt', '🕊️', 'QT'], ['bible', '📖', '통독'], ['grow', '⭐', '성경책']])}`;
+    mountPet(document.getElementById('fgrow'), growCache);
   };
   draw(null, null);
   const n = q => q.then(r => (r.error ? null : r.count || 0), () => null);

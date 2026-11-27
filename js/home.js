@@ -73,7 +73,7 @@ function renderHome() {
         ${shot && aurls[shot.thumb] ? `<a class="hpol" href="#/album" aria-label="사진 앨범"><img src="${esc(aurls[shot.thumb])}" alt=""><span>${esc(shot.caption || ago(shot.taken_date))}</span></a>` : ''}
       </div>
 
-      <div id="hgrow">${growWidget(growCache)}</div>
+      <div id="hgrow"></div>
 
       <h2 class="hmark green">오늘의 말씀</h2>
       <button class="hverse" id="hverse" hidden></button>
@@ -84,12 +84,13 @@ function renderHome() {
           `${esc(names[x.key] || '')}${x.kind === 'ann' ? ' · 기념일' : x.time ? ' · ' + fmtTime(x.time) : ''}`)).join('')
         : row('#/calendar', '한 달 안에 잡힌 일정이 없어요', '캘린더 보기')}`;
     fillVerse(document.getElementById('hverse'));
+    mountPet(document.getElementById('hgrow'), growCache);
     const r = document.getElementById('refreshBtn');
     if (r) r.onclick = start;
   };
 
   draw();                                              // 먼저 바로 그리고
-  growPoints().then(g => { const box = document.getElementById('hgrow'); if (box) box.innerHTML = growWidget(g); });
+  growPoints().then(g => mountPet(document.getElementById('hgrow'), g));
   Promise.all([
     sb.from('anniversaries').select('title, date, repeat_yearly'),
     sb.from('events').select('owner_id, title, start_date, start_time, end_date, repeat_rule'),
