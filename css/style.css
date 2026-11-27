@@ -490,3 +490,35 @@ main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bottom) + 112px)
 .wplace .fnone { font-size: 28px; }
 .stars svg, .starpick svg, .fstar svg { stroke: none; }
 .fdetail a.btn { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+
+/* ───────── 데이트 지도 ───────── */
+.mapbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: var(--space-sm); }
+.mapbar select {
+  min-height: 44px; max-width: 100%; padding: 6px 12px; border: 2px solid var(--color-foreground); border-radius: 12px; background: var(--color-card);
+  font-size: 15px; font-family: inherit; color: var(--color-foreground);
+}
+.mapstat { flex: none; font-size: 14px; color: var(--color-muted-foreground); }
+.mapstat b { font-size: 20px; font-weight: 800; color: var(--color-foreground); }
+.kmap { display: block; width: 100%; max-height: 62vh; margin: var(--space-sm) 0 var(--space-md); }
+.kmap .reg { fill: #e7e0d3; stroke: #fff; stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.kmap .reg.on { fill: #fbbf24; }
+.kmap a:active .reg, .kmap .regg:active .reg { fill: #d6cdbb; }
+.kmap .regg { cursor: pointer; outline: none; }
+.kmap .edge { fill: none; stroke: #fff; stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.kmap .regg.sel .reg, .kmap .regg.sel .edge, .kmap .regg:focus-visible .reg { stroke: var(--color-foreground); stroke-width: 3px; }
+.kmap text { text-anchor: middle; dominant-baseline: middle; font-weight: 700; fill: #334155; stroke: none; pointer-events: none; }
+.maphint { font-size: 14px; color: var(--color-muted-foreground); margin: var(--space-sm) 0; }
+.regpanel { background: var(--color-card); border: 2px solid var(--color-foreground); border-radius: 18px; box-shadow: 6px 6px 0 #fde68a; padding: var(--space-md); margin: var(--space-md) 6px var(--space-lg) 0; }
+.reghead { display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-sm); }
+.reghead h2 { margin: 0; font-size: 20px; font-weight: 800; }
+.trip { padding: var(--space-md) 0; border-top: 1px solid var(--color-border); }
+.trip .fshots { margin-bottom: var(--space-sm); }
+.triphead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.triphead b { display: block; font-size: 16px; overflow-wrap: anywhere; }
+.triphead small { font-size: 13px; color: var(--color-muted-foreground); }
+.trip .fmemo { margin: 8px 0 0; }
+.btn.wide.inline { width: 100%; box-shadow: none; margin-top: var(--space-sm); }
+.tripwhere { display: flex; align-items: baseline; gap: 8px; margin-bottom: var(--space-md); }
+.tripwhere b { font-size: 20px; font-weight: 800; }
+.tripwhere small { font-size: 13px; color: var(--color-muted-foreground); }
+.kmap .dot { pointer-events: none; stroke-width: .5px; }

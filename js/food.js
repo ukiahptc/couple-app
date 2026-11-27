@@ -84,22 +84,18 @@ async function renderFoodDetail(id) {
 // 맛집 추가 / 수정
 function openFoodSheet(p) {
   let cat = p?.category || '음식점', again = p ? p.again : false, rating = p?.rating || 0;
-  // 사진 칸: 이미 올라간 것({path}) 과 새로 고른 것({file, preview})
-  let shots = (p?.photos || []).map(path => ({ path }));
-  const removed = [];
   const s = makeSheet(p ? '기록 수정' : '기록 추가', `
     <div class="fchips insheet" id="shCat"></div>
     <input name="name" class="titleinput" maxlength="40" placeholder="가게 이름" value="${esc(p?.name || '')}" aria-label="가게 이름" required>
     <label class="rowline">또갈집<input type="checkbox" class="switch" name="again" ${again ? 'checked' : ''}></label>
     <div class="rowline">날짜<input type="date" name="date" value="${p?.visit_date || toISO(today0())}" aria-label="날짜" required></div>
     <div class="shotrow" id="shShots"></div>
-    <input type="file" id="shFile" accept="image/*" multiple hidden>
     <div class="starpick" id="shStars" role="radiogroup" aria-label="별점"></div>
     <textarea name="memo" rows="4" maxlength="2000" placeholder="메모" aria-label="메모">${esc(p?.memo || '')}</textarea>
     <input name="link" type="text" inputmode="url" autocapitalize="off" autocorrect="off" maxlength="500" placeholder="링크 (네이버 지도, 카카오맵 등)" value="${esc(p?.link || '')}" aria-label="지도 링크">`,
     !!p, '이 기록 삭제');
   const { sheet, form, msg } = s;
-  const fileIn = sheet.querySelector('#shFile');
+  const picker = photoPicker(sheet.querySelector('#shShots'), p?.photos || []);
 
   const drawCat = () => {
     sheet.querySelector('#shCat').innerHTML = FOOD_CATS.map(([n, e]) =>
@@ -112,24 +108,7 @@ function openFoodSheet(p) {
     // 같은 별을 다시 누르면 별점을 지운다
     sheet.querySelectorAll('[data-s]').forEach(b => { b.onclick = () => { const n = Number(b.dataset.s); rating = rating === n ? 0 : n; drawStars(); }; });
   };
-  const drawShots = async () => {
-    const urls = await photoUrls(shots.filter(x => x.path).map(x => x.path));
-    sheet.querySelector('#shShots').innerHTML = shots.map((x, i) => `
-      <span class="shot"><img src="${esc(x.preview || urls[x.path] || '')}" alt="사진 ${i + 1}">
-        <button type="button" data-rm="${i}" aria-label="사진 ${i + 1} 빼기">${icon('close')}</button></span>`).join('')
-      + (shots.length < 4 ? `<button type="button" class="shot add" id="shAdd">${icon('plus')}<small>사진 추가</small></button>` : '');
-    sheet.querySelectorAll('[data-rm]').forEach(b => { b.onclick = () => {
-      const [x] = shots.splice(Number(b.dataset.rm), 1);
-      if (x.path) removed.push(x.path); else URL.revokeObjectURL(x.preview);
-      drawShots();
-    }; });
-    const add = sheet.querySelector('#shAdd'); if (add) add.onclick = () => fileIn.click();
-  };
-  fileIn.onchange = () => {
-    for (const f of [...fileIn.files].slice(0, 4 - shots.length)) shots.push({ file: f, preview: URL.createObjectURL(f) });
-    fileIn.value = ''; drawShots();
-  };
-  drawCat(); drawStars(); drawShots();
+  drawCat(); drawStars();
 
   form.onsubmit = async e => {
     e.preventDefault();
@@ -140,24 +119,17 @@ function openFoodSheet(p) {
     if (!name) { msg.textContent = '가게 이름을 입력해 주세요.'; return; }
     if (raw && !link) { msg.textContent = '링크 칸에는 지도 주소를 붙여 넣어 주세요.'; return; }
     const btn = form.querySelector('.ok'); btn.disabled = true;
-    const uploaded = [];
     try {
-      const todo = shots.filter(x => x.file);
-      for (let i = 0; i < todo.length; i++) {
-        msg.className = 'msg ok'; msg.textContent = `사진 올리는 중 (${i + 1}/${todo.length})`;
-        todo[i].path = await uploadPhoto(todo[i].file, 'food'); uploaded.push(todo[i].path);
-      }
-      const row = { name, category: cat, again: form.again.checked, visit_date: form.date.value, rating, memo: form.memo.value.trim(), link, photos: shots.map(x => x.path) };
+      const photos = await picker.upload('food', (i, n) => { msg.className = 'msg ok'; msg.textContent = `사진 올리는 중 (${i}/${n})`; });
+      const row = { name, category: cat, again: form.again.checked, visit_date: form.date.value, rating, memo: form.memo.value.trim(), link, photos };
       const { error } = p ? await sb.from('places').update(row).eq('id', p.id) : await sb.from('places').insert(row);
       if (error) throw error;
     } catch (err) {
-      await removePhotos(uploaded).catch(() => {});
-      for (const x of shots) if (uploaded.includes(x.path)) delete x.path;
-      btn.disabled = false; msg.className = 'msg';
-      msg.textContent = /bucket|storage|row-level|policy/i.test(err.message || '') ? '사진 저장소 설정이 아직 안 된 것 같습니다. Supabase에서 SQL을 실행했는지 확인해 주세요.' : koError(err);
+      await picker.undo();
+      btn.disabled = false; msg.className = 'msg'; msg.textContent = photoErr(err);
       return;
     }
-    removePhotos(removed).catch(() => {});
+    picker.finish();
     s.close();
     if (p) renderFoodDetail(p.id); else renderFood();
   };

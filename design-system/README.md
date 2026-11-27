@@ -17,3 +17,6 @@ python3 search.py "couple relationship app anniversary shared diary memory" \
 `MASTER.md`, `tokens.json`, `css/tokens.css`는 도구가 만든 원본이다. 직접 고치지 않는다.
 
 - 2026-11-26: 사용자 요청으로 글꼴을 손글씨체 Gaegu로 변경 (`fonts/gaegu`, `css/fonts.css`).
+
+## 지도 자료
+`data/regions.json` 은 통계청(KOSTAT) 2013년 행정구역 경계를 공개 저장소 southkorea/southkorea-maps 의 단순화본에서 받아 SVG 경로로 바꾼 것이다. 2013년 기준이라 그 뒤 바뀐 행정구역(예: 부천시 구, 청주·청원 통합, 군위군의 대구 편입)은 옛 모습이다.

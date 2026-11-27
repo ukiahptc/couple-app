@@ -45,7 +45,7 @@ function renderHome() {
   const P = id => PAGES.find(p => p.id === id);
   const sd = state.couple.start_date, t = today0();
 
-  const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], purls = {} } = {}) => {
+  const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], purls = {}, trips = [] } = {}) => {
     view.innerHTML = `
       ${!partner ? `
       <section class="invite">
@@ -78,7 +78,9 @@ function renderHome() {
       ${widget(P('money'), '#bae6fd', money
         ? `<div class="wsub">이번 달 데이트 지출</div><div class="wnum small">${won(monthTotal(money))}</div>`
         : '<div class="wempty">아직 적은 내역이 없어요</div>')}
-      ${widget(P('map'), '#fde68a', '<div class="wempty">아직 표시한 장소가 없어요</div>')}
+      ${widget(P('map'), '#fde68a', trips.length
+        ? `<div class="wsub">함께 가 본 지역</div><div class="wnum small">${new Set(trips.map(x => x.region_code)).size}곳</div>`
+        : '<div class="wempty">아직 표시한 장소가 없어요</div>')}
       ${widget(P('album'), '#e9d5ff', '<div class="wempty">아직 올린 사진이 없어요</div>')}`;
     const r = document.getElementById('refreshBtn');
     if (r) r.onclick = start;
@@ -92,11 +94,12 @@ function renderHome() {
       .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }).limit(2),
     sb.from('money_dates').select('start_date, money_expenses(amount)'),
     sb.from('places').select('name, category, photos').order('visit_date', { ascending: false }).order('created_at', { ascending: false }).limit(3),
-  ]).then(async ([an, ev, di, mo, pl]) => {
+    sb.from('trips').select('region_code'),
+  ]).then(async ([an, ev, di, mo, pl, tr]) => {
     const places = pl.data || [];
     const purls = await photoUrls(places.map(p => p.photos[0]).filter(Boolean)).catch(() => ({}));
     const onHome = ['', '#', '#/'].includes(location.hash);
     // 받아 온 내용으로 달력 표시와 최근 일기를 채운다
-    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null, places, purls });
+    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null, places, purls, trips: tr.data || [] });
   });
 }

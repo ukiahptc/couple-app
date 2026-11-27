@@ -1,6 +1,6 @@
 // 파일을 수정해 배포할 때마다 이 버전 숫자를 올리면 새 파일이 적용된다.
-const CACHE = 'couple-app-v14';
-const FILES = ['./', 'index.html', 'css/style.css', 'css/tokens.css', 'css/fonts.css', 'js/app.js', 'js/dday.js', 'js/home.js', 'js/calendar.js', 'js/diary.js', 'js/money.js', 'js/photos.js', 'js/food.js', 'js/config.js', 'js/vendor/supabase.js', 'manifest.webmanifest', 'icons/icon-192.png'];
+const CACHE = 'couple-app-v15';
+const FILES = ['./', 'index.html', 'css/style.css', 'css/tokens.css', 'css/fonts.css', 'js/app.js', 'js/dday.js', 'js/home.js', 'js/calendar.js', 'js/diary.js', 'js/money.js', 'js/photos.js', 'js/food.js', 'js/map.js', 'data/regions.json', 'js/config.js', 'js/vendor/supabase.js', 'manifest.webmanifest', 'icons/icon-192.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
