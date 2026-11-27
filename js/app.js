@@ -185,9 +185,11 @@ function renderSettings() {
       <li class="drow"><div class="dmain"><div class="d">상대방</div><div class="t">${partner ? esc(partner.nickname) : '아직 연결되지 않았어요'}</div></div></li>
       <li class="drow"><div class="dmain"><div class="d">초대 코드</div><div class="t">${esc(state.couple.invite_code)}</div></div></li>
       <li class="drow"><div class="dmain"><div class="d">로그인 계정</div><div class="t">${esc(state.user.email)}</div></div></li>
+      <li class="drow" id="pushRow"></li>
     </ul>
     <button class="btn ghost add" id="logoutBtn">로그아웃</button>`;
   document.getElementById('logoutBtn').onclick = logout;
+  drawPushRow(document.getElementById('pushRow'));
 }
 
 function renderMessage(text) {
@@ -267,4 +269,6 @@ start();
 // 서비스 워커 등록: 오프라인에서도 앱 껍데기가 열리게 한다.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+  // 알림을 눌러 들어오면 그 화면으로 이동한다
+  navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.goto) location.hash = e.data.goto; });
 }

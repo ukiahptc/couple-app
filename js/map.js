@@ -142,7 +142,9 @@ function openTripSheet(region, fullName, t, prov) {
       btn.disabled = false; msg.className = 'msg'; msg.textContent = photoErr(err);
       return;
     }
-    picker.finish(); s.close(); renderMap(prov);
+    picker.finish();
+    if (!t) notifyPartner('데이트 지도에 기록했어요', `${region.n} · ${title}`, '#/map/' + prov);
+    s.close(); renderMap(prov);
   };
   if (s.del) s.del.onclick = async () => {
     if (!confirm(`'${t.title}' 기록을 삭제할까요? 사진도 함께 지워집니다.`)) return;

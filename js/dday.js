@@ -157,6 +157,7 @@ function drawDday(rows, loadError, editing = null) {
     const { error } = await q;
     btn.disabled = false;
     if (error) { msg().textContent = koError(error); return; }
+    if (!editRow) notifyPartner('기념일을 추가했어요', values.title, '#/dday');
     renderDday();
   };
 

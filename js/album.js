@@ -45,6 +45,7 @@ async function renderAlbum() {
       } catch (err) { await removePhotos(up).catch(() => {}); failed = err; break; }
     }
     actionBtn.disabled = false;
+    if (done) notifyPartner('사진을 올렸어요', `사진 ${done}장`, '#/album');
     if (location.hash !== '#/album') return;
     await renderAlbum();
     const m2 = document.getElementById('aMsg');

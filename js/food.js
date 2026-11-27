@@ -130,6 +130,7 @@ function openFoodSheet(p) {
       return;
     }
     picker.finish();
+    if (!p) notifyPartner('맛집을 기록했어요', name, '#/food');
     s.close();
     if (p) renderFoodDetail(p.id); else renderFood();
   };

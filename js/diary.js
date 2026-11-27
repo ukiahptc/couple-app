@@ -100,6 +100,7 @@ async function renderDiaryDetail(id) {
     const { error } = await sb.from('diary_comments').insert({ diary_id: id, body });
     btn.disabled = false;
     if (error) { msg.textContent = koError(error); return; }
+    notifyPartner('댓글을 남겼어요', body, '#/diary/' + id);
     const y = window.scrollY; await renderDiaryDetail(id); window.scrollTo(0, y);
   };
   view.querySelectorAll('.cdel').forEach(b => { b.onclick = async () => {
@@ -154,6 +155,7 @@ function openDiarySheet(r) {
       btn.disabled = false; msg.className = 'msg'; msg.textContent = photoErr(err); return;
     }
     if (picker) picker.finish();
+    if (!r) notifyPartner('일기를 썼어요', row.title, '#/diary');
     close();
     r ? renderDiaryDetail(r.id) : renderDiary();
   };

@@ -243,6 +243,7 @@ function openEventSheet(ev) {
       btn.disabled = false; msg.className = 'msg'; msg.textContent = photoErr(err); return;
     }
     if (picker) picker.finish();
+    if (!ev) notifyPartner('일정을 추가했어요', `${row.start_date.slice(5).replace('-', '월 ')}일 · ${row.title}`, '#/calendar');
     cal.sel = row.start_date;
     const d = parseDate(cal.sel); cal.y = d.getFullYear(); cal.m = d.getMonth();
     close(); renderCalendar();

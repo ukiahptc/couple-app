@@ -128,6 +128,7 @@ function openMoneyDateSheet(d) {
     if (error) { msg.textContent = koError(error); return; }
     s.close();
     // 새로 만들었으면 바로 그 데이트 안으로 들어가 지출을 적게 한다
+    if (!d) notifyPartner('데이트 가계부를 추가했어요', row.title, '#/money/' + data.id);
     if (d) renderMoneyDate(d.id); else location.hash = '#/money/' + data.id;
   };
   if (s.del) s.del.onclick = async () => {
@@ -183,6 +184,7 @@ function openExpenseSheet(dateId, x) {
     const { error } = x ? await sb.from('money_expenses').update(row).eq('id', x.id) : await sb.from('money_expenses').insert(row);
     btn.disabled = false;
     if (error) { msg.textContent = koError(error); return; }
+    if (!x) notifyPartner('지출을 적었어요', `${row.title} ${won(amount)}`, '#/money/' + dateId);
     s.close(); renderMoneyDate(dateId);
   };
   if (s.del) s.del.onclick = async () => {
