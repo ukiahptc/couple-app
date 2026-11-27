@@ -612,10 +612,10 @@ body.paper .invite { font-family: var(--font-body); }
 }
 body.paper {
   background-color: #fffdf6; color: var(--ink);
-  background-image: linear-gradient(#e8e4d6 1px, transparent 1px), linear-gradient(90deg, #e8e4d6 1px, transparent 1px);
+  background-image: linear-gradient(#f1eee4 1px, transparent 1px), linear-gradient(90deg, #f1eee4 1px, transparent 1px);
   background-size: 22px 22px; background-attachment: local;
 }
-body.paper .topbar { background: #fffdf6; background-image: linear-gradient(#e8e4d6 1px, transparent 1px), linear-gradient(90deg, #e8e4d6 1px, transparent 1px); background-size: 22px 22px; }
+body.paper .topbar { background: #fffdf6; background-image: linear-gradient(#f1eee4 1px, transparent 1px), linear-gradient(90deg, #f1eee4 1px, transparent 1px); background-size: 22px 22px; }
 body.paper .bottombar { background: none; }
 body.paper input, body.paper textarea, body.paper select, body.paper button { font-family: inherit; }
 
@@ -711,3 +711,8 @@ body.paper { font-synthesis: none; }
 .mamt { font-size: 21px; } .mamt small { font-family: var(--font-body); }
 .cell .num { font-size: 18px; }
 .mcard b, .mrow b, .fname b, .triphead b, .dhead b, .evtitle, .hstk a, .drow .t { font-size: 17px; }
+
+/* 누구 일정인지: 색 점 + 이름 */
+.odot { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; border: 1.5px solid var(--ink); background: var(--us); vertical-align: 1px; }
+.odot.me { background: var(--me); } .odot.pt { background: var(--pt); } .odot.us { background: var(--us); }
+.evwho { display: block; margin-top: 2px; font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); }

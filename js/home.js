@@ -47,7 +47,13 @@ function renderHome() {
 
   document.body.classList.add('onhome');
   const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], trips = [], album = [], aurls = {} } = {}) => {
-    const todays = itemsOn(t, events, annsForRange(anns, t, t), null);
+    // 오늘부터 30일 안의 일정을 가까운 순으로 3개까지. 누구 일정인지도 함께 보여 준다.
+    const until = new Date(t); until.setDate(until.getDate() + 30);
+    const annList = annsForRange(anns, t, until), names = ownerNames(), coming = [];
+    for (let n = 0; n <= 30 && coming.length < 3; n++) {
+      const d = new Date(t); d.setDate(d.getDate() + n);
+      for (const x of itemsOn(d, events, annList, null)) if (coming.length < 3) coming.push({ x, d, n });
+    }
     const di = diaries[0], pl = places[0], shot = album[0];
     const ago = d => { const n = diffDays(t, parseDate(d)); return n === 0 ? '오늘' : n === 1 ? '어제' : `${parseDate(d).getMonth() + 1}월 ${parseDate(d).getDate()}일`; };
     const who = id => esc(state.members.find(x => x.user_id === id)?.nickname || '');
@@ -68,9 +74,11 @@ function renderHome() {
         ${shot && aurls[shot.thumb] ? `<a class="hpol" href="#/album" aria-label="사진 앨범"><img src="${esc(aurls[shot.thumb])}" alt=""><span>${esc(shot.caption || ago(shot.taken_date))}</span></a>` : ''}
       </div>
 
-      <h2 class="hmark">오늘</h2>
-      ${todays.length ? todays.map(x => row('#/calendar', esc(x.title), x.kind === 'ann' ? '기념일' : x.time ? fmtTime(x.time) : '하루 종일')).join('')
-        : row('#/calendar', '오늘은 일정이 없어요', '캘린더 보기')}
+      <h2 class="hmark">다가오는 일정</h2>
+      ${coming.length ? coming.map(({ x, d, n }) => row('#/calendar',
+          `<i class="odot ${x.key}"></i>${n === 0 ? '오늘' : n === 1 ? '내일' : `${d.getMonth() + 1}월 ${d.getDate()}일(${WEEK[d.getDay()]})`} · ${esc(x.title)}`,
+          `${esc(names[x.key] || '')}${x.kind === 'ann' ? ' · 기념일' : x.time ? ' · ' + fmtTime(x.time) : ''}`)).join('')
+        : row('#/calendar', '한 달 안에 잡힌 일정이 없어요', '캘린더 보기')}
 
       <h2 class="hmark green">요즘 우리</h2>
       ${row('#/diary', di ? `일기 · ${esc(di.title)}` : '일기 · 아직 없어요', di ? `${ago(di.entry_date)}, ${who(di.author_id)}` : '쓰러 가기')}

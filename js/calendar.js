@@ -140,7 +140,7 @@ function drawCalendar() {
       <button class="evcard ${x.key}" data-i="${i}">
         <span class="evtime">${x.kind === 'ann' ? '기념일' : x.time
           ? `${fmtTime(x.time)}${x.ev.end_time ? `<small>~ ${fmtTime(x.ev.end_time.slice(0, 5))}</small>` : ''}` : '하루 종일'}</span>
-        <span class="evtitle">${esc(x.title)}</span>
+        <span class="evtitle">${esc(x.title)}<small class="evwho"><i class="odot ${x.key}"></i>${esc(names[x.key] || '')}</small></span>
         ${x.ev?.photos?.length ? `<span class="evphoto" data-p="${esc(x.ev.photos[0])}" aria-label="사진 ${x.ev.photos.length}장"></span>` : ''}
       </button>`).join('')
       : '<div class="blank">이날은 일정이 없어요</div>'}`;
