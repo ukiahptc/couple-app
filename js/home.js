@@ -73,6 +73,8 @@ function renderHome() {
         ${shot && aurls[shot.thumb] ? `<a class="hpol" href="#/album" aria-label="사진 앨범"><img src="${esc(aurls[shot.thumb])}" alt=""><span>${esc(shot.caption || ago(shot.taken_date))}</span></a>` : ''}
       </div>
 
+      <div id="hgrow">${growWidget(growCache)}</div>
+
       <h2 class="hmark green">오늘의 말씀</h2>
       <button class="hverse" id="hverse" hidden></button>
 
@@ -83,7 +85,7 @@ function renderHome() {
         : row('#/calendar', '한 달 안에 잡힌 일정이 없어요', '캘린더 보기')}
 
       <nav class="hstk" aria-label="메뉴">
-        ${[['calendar', '📅', '캘린더'], ['diary', '📔', '일기'], ['food', '🍴', '맛집'], ['money', '💳', '가계부'], ['map', '🗺️', '지도'], ['album', '📷', '앨범'], ['bible', '📖', '통독'], ['qt', '🌱', 'QT']]
+        ${[['calendar', '📅', '캘린더'], ['diary', '📔', '일기'], ['food', '🍴', '맛집'], ['money', '💳', '가계부'], ['map', '🗺️', '지도'], ['album', '📷', '앨범'], ['bible', '📖', '통독'], ['qt', '🕊️', 'QT'], ['ask', '💬', '질문']]
           .map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${e}</b>${n}</a>`).join('')}
       </nav>`;
     fillVerse(document.getElementById('hverse'));
@@ -92,6 +94,7 @@ function renderHome() {
   };
 
   draw();                                              // 먼저 바로 그리고
+  growPoints().then(g => { const box = document.getElementById('hgrow'); if (box) box.innerHTML = growWidget(g); });
   Promise.all([
     sb.from('anniversaries').select('title, date, repeat_yearly'),
     sb.from('events').select('owner_id, title, start_date, start_time, end_date, repeat_rule'),

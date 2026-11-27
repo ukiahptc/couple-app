@@ -34,7 +34,9 @@ const PAGES = [
   { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3, render: param => renderMap(param) },
   { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4, render: () => renderAlbum() },
   { id: 'bible',    name: '성경 통독표', icon: 'records',  stage: 5, render: param => renderBible(param) },
-  { id: 'qt',       name: 'QT',        icon: 'diary',    stage: 5, render: param => renderQt(param) },
+  { id: 'qt',       name: 'QT 나눔',    icon: 'diary',    stage: 5, render: param => renderQt(param) },
+  { id: 'ask',      name: '오늘의 질문', icon: 'comment',  stage: 5, render: () => renderAsk() },
+  { id: 'grow',     name: '성경책 키우기', icon: 'records', stage: 5, render: () => renderGrow() },
   { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings() },
 ];
 

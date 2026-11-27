@@ -1,5 +1,5 @@
-// QT 질문 카드에 쓰는 질문 모음. 날짜 순서대로 하나씩 돌아가며 나온다.
-const QT_QUESTIONS = [
+// 오늘의 질문에 쓰는 질문 모음. 날짜 순서대로 하나씩 돌아가며 나온다.
+const ASK_QUESTIONS = [
   '오늘 하루 중 하나님이 가장 가깝게 느껴진 순간은 언제였나요?',
   '요즘 가장 감사한 일 한 가지를 꼽는다면 무엇인가요?',
   '최근에 읽은 말씀 중 마음에 남은 구절은 무엇인가요?',
@@ -91,48 +91,3 @@ const QT_QUESTIONS = [
   '요즘 내 마음의 날씨는 어떤가요? 왜 그런가요?',
   '오늘 말씀 한 구절을 골라 상대방에게 선물한다면 무엇을 주고 싶나요?',
 ];
-
-// 성경책이 자라는 단계. need: 그 단계가 되는 데 필요한 포인트
-const GROW_STAGES = [
-  { need: 0,    name: '말씀 쪽지',     line: '한 구절이 적힌 작은 쪽지예요' },
-  { need: 10,   name: '얇은 소책자',   line: '쪽지가 모여 작은 책이 되었어요' },
-  { need: 40,   name: '작은 성경',     line: '표지가 생기고 제법 책다워졌어요' },
-  { need: 100,  name: '책갈피 성경',   line: '읽던 자리를 기억하는 끈이 달렸어요' },
-  { need: 250,  name: '두툼한 성경',   line: '손때 묻은 두꺼운 책이 되었어요' },
-  { need: 500,  name: '금박 성경',     line: '책 옆면에 금빛이 둘렸어요' },
-  { need: 1000, name: '빛나는 성경',   line: '펼칠 때마다 빛이 나요' },
-];
-
-// 단계별 그림: 얼굴이 있는 책 캐릭터 (직접 그린 단순한 선 그림). 단계가 오를수록 크고 두꺼워진다.
-function growSvg(stage) {
-  const ink = '#3b342c';
-  const face = (cx, cy, k = 1) => `
-    <circle cx="${cx - 11 * k}" cy="${cy}" r="${2.6 * k}" fill="${ink}"/><circle cx="${cx + 11 * k}" cy="${cy}" r="${2.6 * k}" fill="${ink}"/>
-    <path d="M${cx - 6 * k} ${cy + 8 * k}q${6 * k} ${6 * k} ${12 * k} 0" fill="none" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>
-    <ellipse cx="${cx - 19 * k}" cy="${cy + 7 * k}" rx="${4 * k}" ry="${2.6 * k}" fill="#ffb3c4"/><ellipse cx="${cx + 19 * k}" cy="${cy + 7 * k}" rx="${4 * k}" ry="${2.6 * k}" fill="#ffb3c4"/>`;
-  let art;
-  if (stage === 0) {
-    art = `<path d="M66 70l66-6 6 78-70 6z" fill="#fffdf2" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
-      <path d="M118 65l14-1 1 14z" fill="#f1eee4" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M80 84h34M80 94h24" stroke="#cfc8b8" stroke-width="3" stroke-linecap="round"/>${face(101, 116, .9)}`;
-  } else {
-    // 책 크기와 두께
-    const w = [0, 74, 84, 90, 98, 104, 110][stage], h = [0, 86, 98, 106, 114, 120, 126][stage], t = [0, 6, 10, 12, 18, 20, 22][stage];
-    const x = 100 - w / 2, y = 150 - h, cover = ['', '#bfd9f2', '#b98a5e', '#b98a5e', '#8a5a3c', '#8a5a3c', '#6d3f2a'][stage];
-    const edge = stage >= 5 ? '#f5cf5a' : '#fffdf2';
-    art = `
-      ${stage === 6 ? [[100, y - 26, 0], [52, y - 6, -40], [148, y - 6, 40], [30, y + 34, -75], [170, y + 34, 75]].map(([sx, sy, r]) => `<path d="M${sx} ${sy - 9}v18" transform="rotate(${r} ${sx} ${sy})" stroke="#f5b942" stroke-width="4" stroke-linecap="round"/>`).join('') : ''}
-      <path d="M${x + t} ${y + t}h${w}v${h - t}h-${w}z" fill="${edge}" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round" transform="translate(0 0)"/>
-      ${Array.from({ length: Math.max(1, Math.round(t / 4)) }, (_, i) => `<path d="M${x + w + 2 + i * 4} ${y + 6 + i * 4}v${h - 8}" stroke="${stage >= 5 ? '#d9a93a' : '#cfc8b8'}" stroke-width="1.5"/>`).join('')}
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="${cover}" stroke="${ink}" stroke-width="2.4"/>
-      <path d="M${x + 11} ${y + 2}v${h - 4}" stroke="${ink}" stroke-width="2" opacity=".55"/>
-      ${stage >= 2 ? `<path d="M${100 + 5} ${y + 14}v22M${100 - 4} ${y + 21}h18" stroke="${stage >= 5 ? '#f5cf5a' : '#fff3d6'}" stroke-width="4.5" stroke-linecap="round"/>` : `<path d="M${x + 24} ${y + 20}h${w - 38}M${x + 24} ${y + 30}h${w - 50}" stroke="#fffdf2" stroke-width="3.5" stroke-linecap="round"/>`}
-      ${stage >= 3 ? `<path d="M${x + w - 20} ${y + h - 2}v20l5-5 5 5v-20" fill="#e2557a" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>` : ''}
-      <rect x="${100 - 30 + 5}" y="${y + h * .5 - 4}" width="60" height="${Math.min(46, h * .42)}" rx="14" fill="#fffdf2" stroke="${ink}" stroke-width="2"/>
-      ${face(105, y + h * .5 + Math.min(46, h * .42) / 2 - 8, .85)}`;
-  }
-  return `<svg viewBox="0 0 200 180" role="img" aria-label="${GROW_STAGES[stage].name}">
-    <ellipse cx="102" cy="162" rx="62" ry="7" fill="rgba(59,52,44,.12)"/>
-    ${art}
-  </svg>`;
-}
