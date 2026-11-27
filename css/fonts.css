@@ -1,6 +1,6 @@
 /* 글꼴은 글자 묶음을 여러 파일로 나누지 않고 통째로 한 파일씩 쓴다.
    (나눠 쓰면 일부 파일만 늦게 오거나 실패했을 때 글자 하나만 다른 글꼴로 보인다.)
-   Gaegu: 손글씨체, 한글 2,350자 / 고운돋움: 본문용 둥근 고딕, 한글 11,172자. 둘 다 SIL OFL. */
+   Gaegu: 손글씨체, 한글 2,350자 / 고운돋움: 본문용 둥근 고딕, 한글 11,172자. 둘 다 SIL OFL (fonts/LICENSE-*.txt). */
 @font-face { font-family: 'Gaegu'; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/gaegu-400.woff2) format('woff2'); }
 @font-face { font-family: 'Gaegu'; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/gaegu-700.woff2) format('woff2'); }
 @font-face { font-family: 'Gowun Dodum'; font-style: normal; font-weight: 400; font-display: swap; src: url(../fonts/gowun-dodum-400.woff2) format('woff2'); }
