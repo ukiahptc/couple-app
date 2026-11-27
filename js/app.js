@@ -87,7 +87,7 @@ function setTabs(tab) {
 }
 
 // 탭 화면에 놓는 스티커 메뉴
-const stickers = list => `<nav class="hstk big" aria-label="메뉴">${list.map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${e}</b>${n}</a>`).join('')}</nav>`;
+const stickers = list => `<nav class="hstk big" aria-label="메뉴">${list.map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${cuteIcon(id) || e}</b>${n}</a>`).join('')}</nav>`;
 
 // '우리' 탭: 둘의 일정과 기록
 function renderUsHub() {
@@ -345,3 +345,6 @@ if ('serviceWorker' in navigator) {
   // 알림을 눌러 들어오면 그 화면으로 이동한다
   navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.goto) location.hash = e.data.goto; });
 }
+
+// 아래 탭의 아이콘을 직접 그린 그림으로 바꾼다
+document.querySelectorAll('#tabbar a b').forEach((b, i) => { b.innerHTML = cuteIcon(['home', 'us', 'faith'][i]) || b.innerHTML; });

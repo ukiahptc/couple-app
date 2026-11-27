@@ -953,3 +953,8 @@ body.hastabs main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bot
 .themerow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .themerow .cpsw { flex: 0 0 40px; width: 40px; height: 40px; }
 .themerow button.txt { padding: 7px 12px; font: inherit; font-size: 14px; color: inherit; background: #fff; border: 1.5px solid var(--ink); border-radius: 999px; cursor: pointer; }
+
+/* 직접 그린 귀여운 아이콘 */
+.cicon { display: block; width: 1.4em; height: 1.4em; margin: 0 auto; stroke: none; overflow: visible; }
+.tabbar a b .cicon { width: 30px; height: 30px; }
+.hstk.big b .cicon { width: 58px; height: 58px; margin-bottom: 4px; }
