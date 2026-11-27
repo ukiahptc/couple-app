@@ -269,7 +269,10 @@ async function buyDeco(id, g) {
   const before = JSON.stringify(decoState);
   decoState.owned.push(id);
   applyDeco(id, true);
-  if (await saveDeco()) return '';
+  if (await saveDeco()) {
+    notifyPartner(`꾸미기 숍에서 ‘${x.name}’ 구매했어요`, `우리 점수 ${x.price}점 사용 · 남은 점수 ${decoWallet(g)}점`, '#/shop/closet');
+    return '';
+  }
   decoState = JSON.parse(before);
   return '저장하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.';
 }

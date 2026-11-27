@@ -37,8 +37,9 @@ async function disablePush() {
 // 상대방에게 알리기. 실패해도 저장에는 영향이 없도록 조용히 넘어간다.
 // what 예: '일기를 썼어요'  detail 예: 일기 제목  url 예: '#/diary'
 function notifyPartner(what, detail, url) {
-  if (!pushReady() || state.members.length < 2) return;
   const me = state.members.find(m => m.user_id === state.user.id)?.nickname || '상대방';
+  logNotice(`${me} 님이 ${what}`, detail, url);   // 앱 안 알림 창에도 남긴다
+  if (!pushReady() || state.members.length < 2) return;
   sb.functions.invoke('notify', { body: { title: `${me} 님이 ${what}`, body: detail || '', url } }).catch(() => {});
 }
 
