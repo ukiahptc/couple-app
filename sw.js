@@ -1,5 +1,5 @@
 // 파일을 수정해 배포할 때마다 이 버전 숫자를 올리면 새 파일이 적용된다.
-const CACHE = 'couple-app-v35';
+const CACHE = 'couple-app-v36';
 // 글꼴은 바뀌지 않으므로 따로 보관하고, 한 번 받으면 계속 그것을 쓴다.
 const FONT_CACHE = 'couple-app-fonts-v1';
 const FONTS = ['fonts/gaegu-400.woff2', 'fonts/gaegu-700.woff2', 'fonts/gowun-dodum-400.woff2'];
@@ -7,7 +7,8 @@ const FILES = ['./', 'index.html', 'css/style.css', 'css/tokens.css', 'css/fonts
 
 self.addEventListener('install', e => {
   e.waitUntil(Promise.all([
-    caches.open(CACHE).then(c => c.addAll(FILES)),
+    // 브라우저가 따로 보관해 둔 옛 파일을 쓰지 않도록 서버에서 새로 받는다
+    caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))),
     caches.open(FONT_CACHE).then(c => c.addAll(FONTS)),
   ]).then(() => self.skipWaiting()));
 });
@@ -31,7 +32,7 @@ self.addEventListener('fetch', e => {
     return;
   }
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })   // 서버에 새 버전이 있는지 매번 확인한다 (GitHub Pages 는 10분 동안 옛 파일을 주기도 한다)
       .then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));

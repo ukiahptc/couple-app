@@ -319,7 +319,18 @@ start();
 
 // 서비스 워커 등록: 오프라인에서도 앱 껍데기가 열리게 한다.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+    reg.update().catch(() => {});
+    // 앱으로 돌아올 때마다 새 버전이 있는지 확인한다
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+  }));
+  // 새 버전이 준비되면 화면을 한 번 새로 고쳐 바로 적용한다 (글을 쓰는 중이면 건드리지 않는다)
+  let hadCtl = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadCtl) { hadCtl = true; return; }
+    if (reloaded || document.querySelector('.sheet')) return;
+    reloaded = true; location.reload();
+  });
   // 알림을 눌러 들어오면 그 화면으로 이동한다
   navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.goto) location.hash = e.data.goto; });
 }
