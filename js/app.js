@@ -34,6 +34,7 @@ const PAGES = [
   { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3, render: param => renderMap(param) },
   { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4, render: () => renderAlbum() },
   { id: 'bible',    name: '성경 통독표', icon: 'records',  stage: 5, render: param => renderBible(param) },
+  { id: 'qt',       name: 'QT',        icon: 'diary',    stage: 5, render: param => renderQt(param) },
   { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings() },
 ];
 
@@ -249,7 +250,7 @@ window.addEventListener('hashchange', route);
 
 // 손글씨체로 보이는 줄에 Gaegu 에 없는 한글이 섞이면 그 글자만 다른 글꼴로 바뀌어 깨져 보인다.
 // 그런 줄은 통째로 본문 글꼴(nohw)로 바꾼다. 화면이 바뀔 때마다 다시 살핀다.
-const HW_SPOTS = '#pageTitle, .hli span, .hli small, .hpol span, .hnote p, .hnote b, .mtitle2 h2, .fdetail h2, .dfull h2, .tripwhere b, .reghead h2, .sheethead b, .mmonth, .daytitle, .btn.wide';
+const HW_SPOTS = '#pageTitle, .qq, .seedinfo b, .hli span, .hli small, .hpol span, .hnote p, .hnote b, .mtitle2 h2, .fdetail h2, .dfull h2, .tripwhere b, .reghead h2, .sheethead b, .mmonth, .daytitle, .btn.wide';
 function fixHandwriting() {
   document.querySelectorAll(HW_SPOTS).forEach(el => {
     const bad = [...el.textContent].some(c => c >= '\uac00' && c <= '\ud7a3' && !GAEGU_HANGUL.has(c));
