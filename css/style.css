@@ -557,15 +557,9 @@ main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bottom) + 112px)
 
 /* ───────── 홈: 다이어리 꾸미기 ─────────
    모눈종이 바탕, 메모지와 마스킹테이프, 폴라로이드, 형광펜 제목, 손글씨체 */
-body.paper {
-  --ink: #3b342c; --ink-soft: #8a7f70;
-  background-color: #fffdf6; color: var(--ink);
-  background-image: linear-gradient(#e8e4d6 1px, transparent 1px), linear-gradient(90deg, #e8e4d6 1px, transparent 1px);
-  background-size: 22px 22px;
-}
 body.paper .topbar { background: none; }
 body.paper .topbar h1 { font-size: 28px; font-weight: 700; color: var(--ink); }
-body.paper main { font-family: var(--font-heading); }
+body.onhome main { font-family: var(--font-heading); }
 body.paper .roundbtn { border-color: var(--ink); color: var(--ink); background: #fff; }
 .hdate { font-size: 18px; color: var(--ink-soft); margin: -6px 0 var(--space-md); }
 .htop { position: relative; min-height: 190px; margin: 18px 0 8px; }
@@ -604,3 +598,105 @@ body.paper .roundbtn { border-color: var(--ink); color: var(--ink); background: 
 .hstk a:nth-child(5) { background: #fff3b8; }
 .hstk a:nth-child(6) { background: #e9defa; transform: rotate(1.5deg); }
 body.paper .invite { font-family: var(--font-body); }
+
+/* ───────── 전체 화면: 다이어리 꾸미기 ─────────
+   앞에서 정한 모양 위에 덮어쓴다. 바탕은 모눈종이, 글자는 잉크색,
+   본문은 둥근 고딕(고운돋움), 제목과 큰 숫자는 손글씨체(Gaegu). */
+:root {
+  --ink: #3b342c; --ink-soft: #8a7f70; --line: #c9c1b0;
+  --color-background: #fffdf6; --color-foreground: #3b342c; --color-card: #ffffff; --color-card-foreground: #3b342c;
+  --color-muted: #f6f1e4; --color-muted-foreground: #7d7263; --color-border: #d9d2c2;
+  --color-primary: #c2456b; --color-ring: #c2456b;
+  --font-body: "Gowun Dodum", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --wobble: 14px 18px 12px 20px;
+}
+body.paper {
+  background-color: #fffdf6; color: var(--ink);
+  background-image: linear-gradient(#e8e4d6 1px, transparent 1px), linear-gradient(90deg, #e8e4d6 1px, transparent 1px);
+  background-size: 22px 22px; background-attachment: local;
+}
+body.paper .topbar { background: #fffdf6; background-image: linear-gradient(#e8e4d6 1px, transparent 1px), linear-gradient(90deg, #e8e4d6 1px, transparent 1px); background-size: 22px 22px; }
+body.paper .bottombar { background: none; }
+body.paper input, body.paper textarea, body.paper select, body.paper button { font-family: inherit; }
+
+/* 카드류: 흰 종이 + 가는 잉크 선 + 살짝 삐뚠 모서리. 색 그림자는 없앤다 */
+.mcard, .fcard, .dcard, .dfull, .evcard, .regpanel, .invite, .startday, .form.inline, .stamp {
+  border: 1.5px solid var(--ink); border-radius: var(--wobble); box-shadow: 1px 2px 0 rgba(59, 52, 44, .12); margin-right: 0;
+}
+.mcard, .fcard, .dcard, .dfull, .regpanel, .btn.wide { width: 100%; }
+.mcard:active, .fcard:active, .dcard:active { transform: none; box-shadow: none; opacity: .8; }
+.fcard:nth-child(odd) { transform: rotate(-.8deg); } .fcard:nth-child(even) { transform: rotate(.8deg); }
+.fcard { background: #fff; padding: 8px 8px 10px; border-radius: 4px; border-width: 1px; box-shadow: 1px 2px 4px rgba(0, 0, 0, .16); }   /* 폴라로이드 */
+.fphoto, .fshots img, .athumb { border-radius: 3px; }
+.fshots img { border: 7px solid #fff; border-bottom-width: 22px; box-shadow: 1px 2px 4px rgba(0, 0, 0, .18); }
+.evcard.me, .evcard.pt, .evcard.us { box-shadow: 1px 2px 0 rgba(59, 52, 44, .12); }
+
+/* 합계 상자는 노란 메모지 */
+.mtotal {
+  position: relative; border: 0; border-radius: 0; background: #fff3b8; box-shadow: 1px 2px 0 rgba(0, 0, 0, .08);
+  transform: rotate(-1deg); margin: 14px 8px var(--space-xl) 2px; padding: 20px 18px 12px;
+}
+.mtotal::before { content: ""; position: absolute; top: -10px; left: 50%; width: 84px; height: 20px; margin-left: -42px; background: rgba(240, 150, 170, .65); transform: rotate(2deg); }
+.mtotal small { font-family: var(--font-heading); font-size: 19px; font-weight: 400; color: var(--ink); }
+.mtotal b { font-family: var(--font-heading); font-size: 44px; font-weight: 700; line-height: 1.1; }
+
+/* 제목: 손글씨 + 형광펜 */
+.topbar h1 { font-size: 28px; font-weight: 700; letter-spacing: 0; }
+.mmonth, .daytitle, .reghead h2, .form h2 {
+  display: inline-block; font-family: var(--font-heading); font-size: 22px; font-weight: 700; color: var(--ink);
+  padding: 0 4px; background: linear-gradient(transparent 55%, #bfe3c0 55%);
+}
+.mmonth { display: table; margin-bottom: var(--space-md); }
+.daytitle { background: linear-gradient(transparent 55%, #ffd0dc 55%); }
+.mtitle2 h2, .fdetail h2, .dfull h2, .monthbtn, .tripwhere b, .sheethead b, .mapstat b, .startday .big, .wnum, .stamp b {
+  font-family: var(--font-heading); font-weight: 700; letter-spacing: 0;
+}
+.mtitle2 h2, .fdetail h2, .dfull h2 { font-size: 30px; }
+.monthbtn { font-size: 26px; } .sheethead b { font-size: 22px; }
+.mamt, .mcard b, .mrow b, .fname b, .triphead b, .dhead b, .evtitle { font-weight: 700; }
+
+/* 줄 목록은 점선 */
+.mrow, .blank, .cmt, .drow { border-color: var(--line); border-style: none none dashed; border-bottom-width: 1.5px; }
+.trip { border-color: var(--line); border-style: dashed none none; }
+.mrow { border-bottom-width: 1.5px; } .trip { border-top-width: 1.5px; } .blank { border-bottom-width: 1.5px; }
+.memoji { background: #f6f1e4; border-radius: var(--wobble); }
+
+/* 버튼과 칩은 스티커 */
+.btn { border: 1.5px solid var(--ink); border-radius: var(--wobble); background: #ffd9e2; color: var(--ink); font-weight: 700; }
+.btn.ghost { background: #fff; color: var(--ink); }
+.btn.wide { box-shadow: 1px 2px 0 rgba(59, 52, 44, .12); border-width: 1.5px; border-radius: var(--wobble); font-family: var(--font-heading); font-size: 21px; }
+.fdetail a.btn { color: var(--ink); }
+.roundbtn { border: 1.5px solid var(--ink); color: var(--ink); background: #fff; }
+.roundbtn.ok { color: #c2456b; }
+.ownchip, .fchip, .catbtn { border: 1.5px solid var(--ink); border-radius: var(--wobble); box-shadow: none; color: var(--ink-soft); }
+.ownchip.me.on, .ownchip.pt.on, .ownchip.us.on, .catbtn.on { box-shadow: none; color: var(--ink); }
+.fchip.on { background: #ffd9e2; color: var(--ink); }
+.catbtn.on { background: #d6ecff; }
+.fbar select, .fbar input, .mapbar select, .cform input,
+.form input, .sheetbody textarea, .amtbox, .sheetbody .titleinput, .sheetbody input[name=link] {
+  border: 1.5px solid var(--ink); border-radius: 10px 14px 10px 12px; background: #fff; color: var(--ink);
+}
+.sheetbody .amtbox input, .sheetbody .plaintitle, .sheetbody .plainbody { border: 0; border-radius: 0; }
+.sheetbody .plaintitle { font-family: var(--font-heading); font-size: 28px; font-weight: 700; border-bottom: 1.5px dashed var(--line); }
+.form .rowline input[type=date], .form .rowline input[type=time], .form .rowline select { border: 0; background: #f6f1e4; border-radius: 10px 14px 10px 12px; }
+.form .switch { border: 1.5px solid var(--ink); border-radius: 14px; }
+.form .switch::after { background: var(--ink); }
+.sheetbody { background-color: #fffdf6; border-radius: 22px 26px 0 0; border-top: 1.5px solid var(--ink); }
+.shot.add { border: 1.5px dashed var(--ink-soft); color: var(--ink-soft); border-radius: var(--wobble); }
+.offline { border: 0; border-radius: 0; background: #fff3b8; box-shadow: 1px 2px 0 rgba(0, 0, 0, .08); font-weight: 400; }
+
+/* 캘린더·지도·일기 세부 */
+.calgrid .cell.sel, .cell.sel { border-radius: 10px 14px 10px 12px; }
+.kmap .reg { fill: #efe8d8; stroke: #fffdf6; }
+.kmap .reg.on { fill: #f6c744; }
+.kmap text { fill: var(--ink); font-family: var(--font-body); }
+.fbadge.static { background: #f6f1e4; border-radius: var(--wobble); } .fbadge.again { background: #ffd9e2; }
+.stamp { background: #fff; }
+.brand { border-bottom: 1.5px dashed var(--line); }
+.brand .logo { background: #ffd9e2; color: var(--ink); border: 1.5px solid var(--ink); border-radius: var(--wobble); }
+.brand .word, .invite .code { font-weight: 700; }
+.hero { position: relative; background: #fff3b8; color: var(--ink); border-radius: 0; box-shadow: 1px 2px 0 rgba(0, 0, 0, .08); transform: rotate(-1deg); margin: 14px 8px var(--space-xl) 2px; }
+.hero::before { content: ""; position: absolute; top: -10px; left: 50%; width: 84px; height: 20px; margin-left: -42px; background: rgba(240, 150, 170, .65); transform: rotate(2deg); }
+.hero .num { font-weight: 700; } .hero .since { border-top: 1.5px dashed rgba(59, 52, 44, .35); }
+.drow .dleft { font-weight: 700; } .drow .dleft.now { background: #ffd9e2; color: var(--ink); }
+.fgrid { padding: 0 4px; }

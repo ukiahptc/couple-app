@@ -45,7 +45,7 @@ function renderHome() {
   const P = id => PAGES.find(p => p.id === id);
   const sd = state.couple.start_date, t = today0();
 
-  document.body.classList.add('paper');
+  document.body.classList.add('onhome');
   const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], trips = [], album = [], aurls = {} } = {}) => {
     const todays = itemsOn(t, events, annsForRange(anns, t, t), null);
     const di = diaries[0], pl = places[0], shot = album[0];
