@@ -242,6 +242,12 @@ async function logout() {
 }
 menuBtn.addEventListener('click', logout);
 window.addEventListener('hashchange', route);
+// 인터넷이 끊기면 위에 안내 띠를 보여 주고, 다시 연결되면 지금 화면을 새로 불러온다
+const offlineBar = document.getElementById('offline');
+const syncOnline = () => { offlineBar.hidden = navigator.onLine; };
+window.addEventListener('offline', syncOnline);
+window.addEventListener('online', () => { syncOnline(); if (state.user && !document.querySelector('.sheet')) route(); });
+syncOnline();
 start();
 
 // 서비스 워커 등록: 오프라인에서도 앱 껍데기가 열리게 한다.
