@@ -38,6 +38,7 @@ const PAGES = [
   { id: 'ask',      name: '오늘의 질문', icon: 'comment',  stage: 5, render: () => renderAsk(), tab: 'faith' },
   { id: 'thanks',   name: '감사 일기',  icon: 'heart',    stage: 5, render: param => renderThanks(param), tab: 'faith' },
   { id: 'grow',     name: '성경책 키우기', icon: 'records', stage: 5, render: () => renderGrow(), tab: 'faith' },
+  { id: 'shop',     name: '꾸미기 숍',  icon: 'heart',    stage: 5, render: param => renderShop(param), tab: '' },
   { id: 'us',       name: '우리',       icon: 'heart',    tab: 'us',    render: () => renderUsHub() },
   { id: 'faith',    name: '믿음',       icon: 'records',  tab: 'faith', render: () => renderFaithHub() },
   { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings(), tab: '' },
