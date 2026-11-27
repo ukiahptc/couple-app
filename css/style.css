@@ -604,18 +604,18 @@ body.paper .invite { font-family: var(--font-body); }
    본문은 둥근 고딕(고운돋움), 제목과 큰 숫자는 손글씨체(Gaegu). */
 :root {
   --ink: #3b342c; --ink-soft: #8a7f70; --line: #c9c1b0;
-  --color-background: #fffdf6; --color-foreground: #3b342c; --color-card: #ffffff; --color-card-foreground: #3b342c;
+  --color-background: var(--paper); --color-foreground: #3b342c; --color-card: #ffffff; --color-card-foreground: #3b342c;
   --color-muted: #f6f1e4; --color-muted-foreground: #7d7263; --color-border: #d9d2c2;
   --color-primary: var(--theme-deep); --color-ring: var(--theme-deep);
   --font-body: "Gowun Dodum", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --wobble: 14px 18px 12px 20px;
 }
 body.paper {
-  background-color: #fffdf6; color: var(--ink);
-  background-image: linear-gradient(#f1eee4 1px, transparent 1px), linear-gradient(90deg, #f1eee4 1px, transparent 1px);
+  background-color: var(--paper); color: var(--ink);
+  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px), linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
   background-size: 22px 22px; background-attachment: local;
 }
-body.paper .topbar { background: #fffdf6; background-image: linear-gradient(#f1eee4 1px, transparent 1px), linear-gradient(90deg, #f1eee4 1px, transparent 1px); background-size: 22px 22px; }
+body.paper .topbar { background: var(--paper); background-image: linear-gradient(var(--paper-line) 1px, transparent 1px), linear-gradient(90deg, var(--paper-line) 1px, transparent 1px); background-size: 22px 22px; }
 body.paper .bottombar { background: none; }
 body.paper input, body.paper textarea, body.paper select, body.paper button { font-family: inherit; }
 
@@ -681,13 +681,13 @@ body.paper input, body.paper textarea, body.paper select, body.paper button { fo
 .form .rowline input[type=date], .form .rowline input[type=time], .form .rowline select { border: 0; background: #f6f1e4; border-radius: 10px 14px 10px 12px; }
 .form .switch { border: 1.5px solid var(--ink); border-radius: 14px; }
 .form .switch::after { background: var(--ink); }
-.sheetbody { background-color: #fffdf6; border-radius: 22px 26px 0 0; border-top: 1.5px solid var(--ink); }
+.sheetbody { background-color: var(--paper); border-radius: 22px 26px 0 0; border-top: 1.5px solid var(--ink); }
 .shot.add { border: 1.5px dashed var(--ink-soft); color: var(--ink-soft); border-radius: var(--wobble); }
 .offline { border: 0; border-radius: 0; background: var(--memo); box-shadow: 1px 2px 0 rgba(0, 0, 0, .08); font-weight: 400; }
 
 /* 캘린더·지도·일기 세부 */
 .calgrid .cell.sel, .cell.sel { border-radius: 10px 14px 10px 12px; }
-.kmap .reg { fill: #efe8d8; stroke: #fffdf6; }
+.kmap .reg { fill: #efe8d8; stroke: var(--paper); }
 .kmap .reg.on { fill: #f6c744; }
 .kmap text { fill: var(--ink); font-family: var(--font-body); }
 .fbadge.static { background: #f6f1e4; border-radius: var(--wobble); } .fbadge.again { background: var(--theme-soft); }
@@ -781,7 +781,7 @@ body.paper { font-synthesis: none; }
 .qa.pt { background: #e3f0fb; }
 .qa p { margin: 4px 0 0; white-space: pre-wrap; word-break: break-word; }
 .qa .link { position: absolute; top: 6px; right: 10px; width: auto; margin: 0; padding: 2px 4px; font-size: 13px; }
-.qcard textarea { display: block; width: 100%; margin-bottom: 8px; padding: 10px 12px; font: inherit; color: inherit; background: #fffdf6; border: 1.5px dashed #cfc8b8; border-radius: 10px; resize: vertical; }
+.qcard textarea { display: block; width: 100%; margin-bottom: 8px; padding: 10px 12px; font: inherit; color: inherit; background: var(--paper); border: 1.5px dashed #cfc8b8; border-radius: 10px; resize: vertical; }
 .sfilter { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0 4px; }
 .sfilter input { grid-column: 1 / -1; }
 .sfilter select, .sfilter input, .spass select, .spass input { min-width: 0; padding: 9px 10px; font: inherit; font-size: 15px; color: inherit; background: #fff; border: 1.5px solid var(--ink); border-radius: 9px 12px 8px 13px; }
@@ -809,7 +809,7 @@ body.paper { font-synthesis: none; }
 .qcard.today { margin-top: 18px; }
 
 /* ───────── 아래 탭 3개 (홈 · 우리 · 믿음) ───────── */
-body.paper .tabbar { background: #fffdf6; border-top: 2px solid var(--ink); }
+body.paper .tabbar { background: var(--paper); border-top: 2px solid var(--ink); }
 body.paper .tabbar a { gap: 0; font-family: var(--font-heading); font-size: 17px; color: #8a7f70; }
 .tabbar a b { font-size: 21px; font-weight: 400; line-height: 1.2; font-family: "Apple Color Emoji", "Noto Color Emoji", sans-serif; filter: grayscale(1); opacity: .6; }
 body.paper .tabbar a[aria-current="page"] { color: var(--ink); font-weight: 700; background: linear-gradient(transparent 62%, var(--theme) 62%, var(--theme) 88%, transparent 88%); }
@@ -915,7 +915,7 @@ body.hastabs main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bot
 
 /* 색 고르기 창 */
 .cpwrap { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; background: rgba(59, 52, 44, .35); }
-.cp { width: 100%; max-width: 480px; max-height: 96vh; overflow-y: auto; padding: 18px 18px calc(10px + env(safe-area-inset-bottom)); color: var(--ink); background: #fffdf5; border: 1.5px solid var(--ink); border-bottom: 0; border-radius: 22px 22px 0 0; }
+.cp { width: 100%; max-width: 480px; max-height: 96vh; overflow-y: auto; padding: 18px 18px calc(10px + env(safe-area-inset-bottom)); color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink); border-bottom: 0; border-radius: 22px 22px 0 0; }
 .cp button { font: inherit; color: inherit; cursor: pointer; }
 .cptabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
 .cptabs button { padding: 9px 0; background: #f6f3ea; border: 1.5px solid transparent; border-radius: 999px; color: #8a7f70; }
@@ -948,7 +948,7 @@ body.hastabs main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bot
 .coverrow button.txt { padding: 8px 14px; font: inherit; color: inherit; background: #fff; border: 1.5px solid var(--ink); border-radius: 999px; cursor: pointer; }
 
 /* 테마 색: 설정에서 고른 색으로 앱의 형광펜·버튼·강조 색이 바뀐다 (js/colorpick.js 의 applyTheme) */
-:root { --theme: #ffd0dc; --theme-soft: #ffd9e2; --theme-deep: #c2456b; --theme-tape: rgba(240, 150, 170, .65); --memo: #fff3b8; }
+:root { --theme: #ffd0dc; --theme-soft: #ffd9e2; --theme-deep: #c2456b; --theme-tape: rgba(240, 150, 170, .65); --memo: #fff3b8; --paper: #fffdf6; --paper-line: #f1eee4; }
 .themerow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .themerow .cpsw { flex: 0 0 40px; width: 40px; height: 40px; }
 .themerow button.txt { padding: 7px 12px; font: inherit; font-size: 14px; color: inherit; background: #fff; border: 1.5px solid var(--ink); border-radius: 999px; cursor: pointer; }

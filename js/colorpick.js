@@ -140,3 +140,19 @@ function setMemo(hex) {
   applyMemo(hex);
 }
 applyMemo(memoColor());
+
+// 바탕 색: 격자무늬 종이의 색. 격자 줄은 바탕보다 조금 진하게 맞춘다. 글씨가 보이도록 어두운 색은 밝게 올려 쓴다.
+const PAPER_DEFAULT = '#fffdf6';
+const paperColor = () => { try { const c = localStorage.getItem('paperColor'); return cpValid(c) ? c : ''; } catch (e) { return ''; } };
+function applyPaper(hex) {
+  const st = document.documentElement.style, meta = document.querySelector('meta[name="theme-color"]');
+  if (!cpValid(hex)) { st.removeProperty('--paper'); st.removeProperty('--paper-line'); if (meta) meta.content = PAPER_DEFAULT; return; }
+  const bg = memoShade(hex), line = cpHex(...cpRgb(bg).map((x, i) => x * .93 + [59, 52, 44][i] * .07));
+  st.setProperty('--paper', bg); st.setProperty('--paper-line', line);
+  if (meta) meta.content = bg;
+}
+function setPaper(hex) {
+  try { if (cpValid(hex)) localStorage.setItem('paperColor', hex); else localStorage.removeItem('paperColor'); } catch (e) { /* 저장 공간을 못 쓰는 경우는 넘어간다 */ }
+  applyPaper(hex);
+}
+applyPaper(paperColor());

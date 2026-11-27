@@ -151,7 +151,7 @@ async function thanksImage(ws, rows) {
   const listH = items.reduce((a, x) => a + x.lines.length * 58 + 62, 0);
   const H = Math.max(1350, 420 + listH + (more ? 70 : 0) + 260);
   cv.width = W; cv.height = H;
-  c.fillStyle = '#fffdf6'; c.fillRect(0, 0, W, H);
+  c.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim() || '#fffdf6'; c.fillRect(0, 0, W, H);
   c.strokeStyle = '#f1eee4'; c.lineWidth = 2;
   for (let x = 0; x <= W; x += 54) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
   for (let y = 0; y <= H; y += 54) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
