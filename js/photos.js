@@ -18,8 +18,8 @@ async function shrinkPhoto(file, max = 1600) {
 }
 
 // 올리고 저장소 경로를 돌려준다. folder 예: 'food'
-async function uploadPhoto(file, folder) {
-  const blob = await shrinkPhoto(file);
+async function uploadPhoto(file, folder, max = 1600) {
+  const blob = await shrinkPhoto(file, max);
   const path = `${state.couple.id}/${folder}/${crypto.randomUUID()}.jpg`;
   const { error } = await sb.storage.from(PHOTO_BUCKET).upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
   if (error) throw error;

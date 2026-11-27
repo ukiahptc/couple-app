@@ -32,7 +32,7 @@ const PAGES = [
   { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3, render: param => renderFood(param) },
   { id: 'money',    name: '데이트 가계부', icon: 'money',  stage: 3, render: param => renderMoney(param) },
   { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3, render: param => renderMap(param) },
-  { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4 },
+  { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4, render: () => renderAlbum() },
   { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings() },
 ];
 
