@@ -544,3 +544,12 @@ main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bottom) + 112px)
 .vfoot .dmeta { color: #cbd5e1; }
 .vfoot p { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .vfoot .who.me { color: #f9a8d4; } .vfoot .who.pt { color: #93c5fd; }
+
+/* ───────── 일기·일정 사진 ───────── */
+.dthumbs { position: relative; width: 72px; height: 72px; margin-top: 8px; border-radius: 10px; overflow: hidden; }
+.dthumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dthumbs span { position: absolute; right: 4px; bottom: 4px; padding: 1px 6px; border-radius: 999px; background: rgba(15, 23, 42, .72); color: #fff; font-size: 11px; font-weight: 700; }
+.dfull .fshots { margin: var(--space-md) 0 0; }
+.evphoto { flex: none; width: 40px; height: 40px; margin-left: auto; border-radius: 8px; overflow: hidden; background: rgba(15, 23, 42, .08); }
+.evphoto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sheetbody.tall .shotrow { margin-top: var(--space-md); }

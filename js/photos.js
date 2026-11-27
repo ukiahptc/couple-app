@@ -80,3 +80,15 @@ function photoPicker(box, paths, max = 4) {
   };
 }
 const photoErr = err => /bucket|storage|row-level|policy/i.test(err?.message || '') ? '사진 저장소 설정이 아직 안 된 것 같습니다. Supabase에서 SQL을 실행했는지 확인해 주세요.' : koError(err);
+
+// 사진 칸(photos)이 나중에 추가된 표를 읽을 때 쓴다. 아직 SQL 을 안 돌려 칸이 없으면 사진 없이 읽는다.
+const photoCol = {};
+async function withPhotos(table, run) {
+  if (photoCol[table] !== false) {
+    const r = await run(', photos');
+    if (!r.error) { photoCol[table] = true; return r; }
+    if (!/photos/.test(r.error.message || '')) return r;
+    photoCol[table] = false;
+  }
+  return run('');
+}

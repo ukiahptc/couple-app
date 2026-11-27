@@ -10,12 +10,13 @@ const nowTime = () => { const d = new Date(); return `${String(d.getHours()).pad
 const commentCount = row => row.diary_comments?.[0]?.count || 0;
 
 // 목록에서 쓰는 일기 카드
-function diaryCard(r) {
+function diaryCard(r, thumb) {
   const n = commentCount(r);
   return `
     <a class="dcard" href="#/diary/${r.id}">
       <div class="dhead"><b>${esc(r.title)}</b>${whoTag(r.author_id)}<span class="dtime">· ${fmtTime(r.entry_time.slice(0, 5))}</span></div>
       ${r.body ? `<p class="dprev">${esc(r.body)}</p>` : ''}
+      ${thumb ? `<div class="dthumbs"><img src="${esc(thumb)}" alt="" loading="lazy">${r.photos.length > 1 ? `<span>+${r.photos.length - 1}</span>` : ''}</div>` : ''}
       ${n ? `<div class="dcount">${icon('comment')}${n}</div>` : ''}
     </a>`;
 }
@@ -24,8 +25,10 @@ async function renderDiary(id) {
   if (id) return renderDiaryDetail(id);
   setHeader('커플 일기장', { back: true, action: { icon: 'plus', label: '새 일기', onClick: () => openDiarySheet(null) } });
   view.innerHTML = '<div class="spinner" role="status" aria-label="불러오는 중"></div>';
-  const { data, error } = await sb.from('diaries').select(`${DIARY_COLS}, diary_comments(count)`)
-    .order('entry_date', { ascending: false }).order('entry_time', { ascending: false });
+  const { data, error } = await withPhotos('diaries', extra => sb.from('diaries').select(`${DIARY_COLS}${extra}, diary_comments(count)`)
+    .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }));
+  if (location.hash !== '#/diary') return;
+  const thumbs = error ? {} : await photoUrls(data.map(r => r.photos?.[0]).filter(Boolean));
   if (location.hash !== '#/diary') return;
   if (error) { view.innerHTML = `<div class="blank">일기를 불러오지 못했습니다. (${esc(koError(error))})</div>`; return; }
   if (!data.length) {
@@ -40,7 +43,7 @@ async function renderDiary(id) {
     html += `
       <div class="drowwrap">
         ${r.entry_date !== prev ? `<div class="stamp"><span>${d.getMonth() + 1}월</span><b>${d.getDate()}</b><span class="y">${d.getFullYear()}</span></div>` : '<div class="stamp none"></div>'}
-        ${diaryCard(r)}
+        ${diaryCard(r, thumbs[r.photos?.[0]])}
       </div>`;
     prev = r.entry_date;
   }
@@ -52,7 +55,7 @@ async function renderDiaryDetail(id) {
   backBtn.onclick = () => { location.hash = '#/diary'; };
   view.innerHTML = '<div class="spinner" role="status" aria-label="불러오는 중"></div>';
   const [d, c] = await Promise.all([
-    sb.from('diaries').select(DIARY_COLS).eq('id', id).maybeSingle(),
+    withPhotos('diaries', extra => sb.from('diaries').select(DIARY_COLS + extra).eq('id', id).maybeSingle()),
     sb.from('diary_comments').select('id, author_id, body, created_at').eq('diary_id', id).order('created_at'),
   ]);
   if (location.hash !== '#/diary/' + id) return;
@@ -71,6 +74,7 @@ async function renderDiaryDetail(id) {
       <h2>${esc(r.title)}</h2>
       <div class="dmeta">${whoTag(r.author_id)}</div>
       <p class="dbody">${esc(r.body)}</p>
+      ${r.photos?.length ? `<div class="fshots ${r.photos.length === 1 ? 'one' : ''}" id="dShots"></div>` : ''}
     </article>
     <h2 class="daytitle">댓글 ${c.data?.length || 0}</h2>
     ${(c.data || []).map(x => `
@@ -85,6 +89,8 @@ async function renderDiaryDetail(id) {
     </form>
     <p class="msg" id="msg" role="alert"></p>`;
 
+  if (r.photos?.length) photoUrls(r.photos).then(u => { const box = document.getElementById('dShots');
+    if (box) box.innerHTML = r.photos.map(x => u[x] ? `<img src="${esc(u[x])}" alt="일기 사진">` : '').join(''); });
   const msg = document.getElementById('msg');
   document.getElementById('cForm').onsubmit = async e => {
     e.preventDefault();
@@ -118,7 +124,8 @@ function openDiarySheet(r) {
       <div class="rowline">날짜<span><input type="date" name="date" value="${r?.entry_date || toISO(today0())}" aria-label="날짜" required>
         <input type="time" name="time" value="${r ? r.entry_time.slice(0, 5) : nowTime()}" aria-label="시간" required></span></div>
       <input name="title" class="plaintitle" maxlength="60" placeholder="제목" value="${esc(r?.title || '')}" aria-label="제목" required>
-      <textarea name="body" class="plainbody" maxlength="5000" placeholder="오늘 하루를 남겨보세요..." aria-label="내용" rows="10">${esc(r?.body || '')}</textarea>
+      <textarea name="body" class="plainbody" maxlength="5000" placeholder="오늘 하루를 남겨보세요..." aria-label="내용" rows="8">${esc(r?.body || '')}</textarea>
+      <div class="shotrow" id="shShots"></div>
       <p class="msg" id="shMsg" role="alert"></p>
       ${r ? '<button type="button" class="link danger" id="shDel">이 일기 삭제</button>' : ''}
     </form>`;
@@ -126,6 +133,8 @@ function openDiarySheet(r) {
   document.body.classList.add('noscroll');
   const form = sheet.querySelector('form'), msg = sheet.querySelector('#shMsg');
   const close = () => { sheet.remove(); document.body.classList.remove('noscroll'); };
+  // 사진 칸은 DB 에 사진 칸이 준비된 뒤에만 보인다
+  const picker = photoCol.diaries ? photoPicker(sheet.querySelector('#shShots'), r?.photos || []) : null;
   sheet.querySelector('#shClose').onclick = () => {
     const dirty = form.title.value !== (r?.title || '') || form.body.value !== (r?.body || '');
     if (!dirty || confirm('쓰던 내용이 사라집니다. 닫을까요?')) close();
@@ -136,9 +145,15 @@ function openDiarySheet(r) {
     const row = { title: form.title.value.trim(), body: form.body.value.trim(), entry_date: form.date.value, entry_time: form.time.value };
     if (!row.title) { msg.textContent = '제목을 입력해 주세요.'; return; }
     const btn = form.querySelector('.ok'); btn.disabled = true;
-    const { error } = r ? await sb.from('diaries').update(row).eq('id', r.id) : await sb.from('diaries').insert(row);
-    btn.disabled = false;
-    if (error) { msg.textContent = koError(error); return; }
+    try {
+      if (picker) row.photos = await picker.upload('diary', (i, n) => { msg.className = 'msg ok'; msg.textContent = `사진 올리는 중 (${i}/${n})`; });
+      const { error } = r ? await sb.from('diaries').update(row).eq('id', r.id) : await sb.from('diaries').insert(row);
+      if (error) throw error;
+    } catch (err) {
+      if (picker) await picker.undo();
+      btn.disabled = false; msg.className = 'msg'; msg.textContent = photoErr(err); return;
+    }
+    if (picker) picker.finish();
     close();
     r ? renderDiaryDetail(r.id) : renderDiary();
   };
@@ -147,6 +162,7 @@ function openDiarySheet(r) {
     if (!confirm(`'${r.title}' 일기를 삭제할까요? 댓글도 함께 지워집니다.`)) return;
     const { error } = await sb.from('diaries').delete().eq('id', r.id);
     if (error) { msg.textContent = koError(error); return; }
+    removePhotos(r.photos || []).catch(() => {});
     close(); location.hash = '#/diary';
   };
   form.title.focus();

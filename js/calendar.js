@@ -88,7 +88,7 @@ async function renderCalendar() {
   view.innerHTML = '<div class="spinner" role="status" aria-label="불러오는 중"></div>';
 
   const [ev, an] = await Promise.all([
-    sb.from('events').select('id, owner_id, title, start_date, start_time, end_date, end_time, repeat_rule, memo'),
+    withPhotos('events', extra => sb.from('events').select('id, owner_id, title, start_date, start_time, end_date, end_time, repeat_rule, memo' + extra)),
     sb.from('anniversaries').select('title, date, repeat_yearly'),
   ]);
   if (location.hash !== '#/calendar') return;
@@ -141,6 +141,7 @@ function drawCalendar() {
         <span class="evtime">${x.kind === 'ann' ? '기념일' : x.time
           ? `${fmtTime(x.time)}${x.ev.end_time ? `<small>~ ${fmtTime(x.ev.end_time.slice(0, 5))}</small>` : ''}` : '하루 종일'}</span>
         <span class="evtitle">${esc(x.title)}</span>
+        ${x.ev?.photos?.length ? `<span class="evphoto" data-p="${esc(x.ev.photos[0])}" aria-label="사진 ${x.ev.photos.length}장"></span>` : ''}
       </button>`).join('')
       : '<div class="blank">이날은 일정이 없어요</div>'}`;
 
@@ -154,6 +155,8 @@ function drawCalendar() {
     const d = parseDate(cal.sel); cal.y = d.getFullYear(); cal.m = d.getMonth();   // 흐린 날짜를 누르면 그 달로 이동
     const y = window.scrollY; drawCalendar(); window.scrollTo(0, y);
   }; });
+  const thumbs = [...view.querySelectorAll('.evphoto')];
+  if (thumbs.length) photoUrls(thumbs.map(s => s.dataset.p)).then(u => thumbs.forEach(s => { if (u[s.dataset.p]) s.innerHTML = `<img src="${esc(u[s.dataset.p])}" alt="">`; }));
   view.querySelectorAll('.evcard').forEach(b => { b.onclick = () => {
     const x = selItems[Number(b.dataset.i)];
     if (x.kind === 'ann') location.hash = '#/dday'; else openEventSheet(x.ev);
@@ -188,6 +191,7 @@ function openEventSheet(ev) {
       <label class="rowline">반복<select name="repeat">${Object.entries(REPEAT_LABEL).map(([k, l]) =>
         `<option value="${k}" ${v.repeat_rule === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
       <textarea name="memo" maxlength="500" placeholder="메모" aria-label="메모" rows="4">${esc(v.memo || '')}</textarea>
+      <div class="shotrow" id="shShots"></div>
       <p class="msg" id="shMsg" role="alert"></p>
       ${ev ? '<button type="button" class="link danger" id="shDel">이 일정 삭제</button>' : ''}
     </form>`;
@@ -195,6 +199,8 @@ function openEventSheet(ev) {
   document.body.classList.add('noscroll');
   const form = sheet.querySelector('form'), msg = sheet.querySelector('#shMsg');
   const close = () => { sheet.remove(); document.body.classList.remove('noscroll'); };
+  // 사진 칸은 DB 에 사진 칸이 준비된 뒤에만 보인다
+  const picker = photoCol.events ? photoPicker(sheet.querySelector('#shShots'), ev?.photos || []) : null;
 
   const drawOwner = () => {
     sheet.querySelector('#shOwner').innerHTML = ['me', 'pt', 'us'].filter(k => names[k]).map(k =>
@@ -228,9 +234,15 @@ function openEventSheet(ev) {
       msg.textContent = '종료가 시작보다 빠릅니다.'; return;
     }
     const btn = form.querySelector('.ok'); btn.disabled = true;
-    const { error } = ev ? await sb.from('events').update(row).eq('id', ev.id) : await sb.from('events').insert(row);
-    btn.disabled = false;
-    if (error) { msg.textContent = koError(error); return; }
+    try {
+      if (picker) row.photos = await picker.upload('calendar', (i, n) => { msg.className = 'msg ok'; msg.textContent = `사진 올리는 중 (${i}/${n})`; });
+      const { error } = ev ? await sb.from('events').update(row).eq('id', ev.id) : await sb.from('events').insert(row);
+      if (error) throw error;
+    } catch (err) {
+      if (picker) await picker.undo();
+      btn.disabled = false; msg.className = 'msg'; msg.textContent = photoErr(err); return;
+    }
+    if (picker) picker.finish();
     cal.sel = row.start_date;
     const d = parseDate(cal.sel); cal.y = d.getFullYear(); cal.m = d.getMonth();
     close(); renderCalendar();
@@ -241,6 +253,7 @@ function openEventSheet(ev) {
     if (!confirm(ev.repeat_rule !== 'none' ? '반복되는 일정 전체가 삭제됩니다. 삭제할까요?' : `'${ev.title}' 일정을 삭제할까요?`)) return;
     const { error } = await sb.from('events').delete().eq('id', ev.id);
     if (error) { msg.textContent = koError(error); return; }
+    removePhotos(ev.photos || []).catch(() => {});
     close(); renderCalendar();
   };
   form.title.focus();
