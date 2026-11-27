@@ -46,7 +46,7 @@ function renderHome() {
   const sd = state.couple.start_date, t = today0();
 
   document.body.classList.add('onhome');
-  const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], trips = [], album = [], aurls = {} } = {}) => {
+  const draw = ({ anns = [], events = [], album = [], aurls = {} } = {}) => {
     // 오늘부터 30일 안의 일정을 가까운 순으로 3개까지. 누구 일정인지도 함께 보여 준다.
     const until = new Date(t); until.setDate(until.getDate() + 30);
     const annList = annsForRange(anns, t, until), names = ownerNames(), coming = [];
@@ -54,9 +54,8 @@ function renderHome() {
       const d = new Date(t); d.setDate(d.getDate() + n);
       for (const x of itemsOn(d, events, annList, null)) if (coming.length < 3) coming.push({ x, d, n });
     }
-    const di = diaries[0], pl = places[0], shot = album[0];
+    const shot = album[0];
     const ago = d => { const n = diffDays(t, parseDate(d)); return n === 0 ? '오늘' : n === 1 ? '어제' : `${parseDate(d).getMonth() + 1}월 ${parseDate(d).getDate()}일`; };
-    const who = id => esc(state.members.find(x => x.user_id === id)?.nickname || '');
     const row = (href, left, right) => `<a class="hli" href="${href}"><span>${left}</span><small>${right}</small></a>`;
     view.innerHTML = `
       <div class="hdate">${t.getMonth() + 1}월 ${t.getDate()}일 ${WEEK[t.getDay()]}요일</div>
@@ -80,12 +79,6 @@ function renderHome() {
           `${esc(names[x.key] || '')}${x.kind === 'ann' ? ' · 기념일' : x.time ? ' · ' + fmtTime(x.time) : ''}`)).join('')
         : row('#/calendar', '한 달 안에 잡힌 일정이 없어요', '캘린더 보기')}
 
-      <h2 class="hmark green">요즘 우리</h2>
-      ${row('#/diary', di ? `일기 · ${esc(di.title)}` : '일기 · 아직 없어요', di ? `${ago(di.entry_date)}, ${who(di.author_id)}` : '쓰러 가기')}
-      ${row('#/food', pl ? `맛집 · ${esc(pl.name)}` : '맛집 · 아직 없어요', pl ? (pl.rating ? '★'.repeat(pl.rating) : esc(pl.category)) : '남기러 가기')}
-      ${row('#/money', '이번 달 데이트 지출', money ? won(monthTotal(money)) : '0원')}
-      ${row('#/map', '함께 가 본 곳', `${new Set(trips.map(x => x.region_code)).size}곳`)}
-
       <nav class="hstk" aria-label="메뉴">
         ${[['calendar', '📅', '캘린더'], ['diary', '📔', '일기'], ['food', '🍴', '맛집'], ['money', '💳', '가계부'], ['map', '🗺️', '지도'], ['album', '📷', '앨범']]
           .map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${e}</b>${n}</a>`).join('')}
@@ -98,18 +91,12 @@ function renderHome() {
   Promise.all([
     sb.from('anniversaries').select('title, date, repeat_yearly'),
     sb.from('events').select('owner_id, title, start_date, start_time, end_date, repeat_rule'),
-    sb.from('diaries').select('author_id, title, body, entry_date, entry_time')
-      .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }).limit(1),
-    sb.from('money_dates').select('start_date, money_expenses(amount)'),
-    sb.from('places').select('name, category, rating').order('visit_date', { ascending: false }).order('created_at', { ascending: false }).limit(1),
-    sb.from('trips').select('region_code'),
     sb.from('album_photos').select('thumb, caption, taken_date').order('taken_date', { ascending: false }).order('created_at', { ascending: false }).limit(1),
-  ]).then(async ([an, ev, di, mo, pl, tr, al]) => {
+  ]).then(async ([an, ev, al]) => {
     const album = al.data || [];
     const aurls = await photoUrls(album.map(x => x.thumb)).catch(() => ({}));
-    const places = pl.data || [];
     const onHome = ['', '#', '#/'].includes(location.hash);
-    // 받아 온 내용으로 달력 표시와 최근 일기를 채운다
-    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null, places, trips: tr.data || [], album, aurls });
+    // 받아 온 내용으로 다가오는 일정과 폴라로이드 사진을 채운다
+    if (onHome) draw({ anns: an.data || [], events: ev.data || [], album, aurls });
   });
 }
