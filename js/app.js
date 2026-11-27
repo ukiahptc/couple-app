@@ -33,6 +33,7 @@ const PAGES = [
   { id: 'money',    name: '데이트 가계부', icon: 'money',  stage: 3, render: param => renderMoney(param) },
   { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3, render: param => renderMap(param) },
   { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4, render: () => renderAlbum() },
+  { id: 'bible',    name: '성경 통독표', icon: 'records',  stage: 5, render: param => renderBible(param) },
   { id: 'settings', name: '설정',       icon: 'gear',     render: () => renderSettings() },
 ];
 

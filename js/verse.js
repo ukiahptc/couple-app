@@ -18,6 +18,11 @@ async function fillVerse(box) {
   box.innerHTML = `<p>${esc(v.t)}</p><small>${esc(v.r)}</small>`;
   box.hidden = false;
   box.onclick = () => openVerse(v);
+  // 그날 앱을 처음 열었을 때는 크게 한 번 띄운다. 같은 날 다시 열면 띄우지 않는다.
+  const day = toISO(today0());
+  let seen = null;
+  try { seen = localStorage.getItem('verseSeen'); localStorage.setItem('verseSeen', day); } catch (e) { seen = day; }
+  if (seen !== day && !document.querySelector('.vfull')) openVerse(v);
 }
 // 눌렀을 때 크게 보기
 function openVerse(v) {
@@ -25,7 +30,7 @@ function openVerse(v) {
   el.className = 'vfull';
   el.innerHTML = `<div class="vcard" role="dialog" aria-label="오늘의 말씀"><i class="tape"></i>
     <h2>오늘의 말씀</h2><p>${esc(v.t)}</p><small>${esc(v.r)}</small>
-    <span class="vsrc">성경전서 개역한글판</span></div>`;
+    <span class="vsrc">성경전서 개역한글판 · 화면을 누르면 닫혀요</span></div>`;
   el.onclick = () => el.remove();
   document.body.appendChild(el);
 }
