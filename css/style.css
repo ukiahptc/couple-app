@@ -912,3 +912,37 @@ body.hastabs main:has(.bottombar) { padding-bottom: calc(env(safe-area-inset-bot
 .dchip.have { background: #f1f8ea; cursor: default; color: inherit; opacity: 1; }
 .dchip.poor small { color: var(--color-destructive); }
 .dchip:disabled { color: inherit; }
+
+/* 색 고르기 창 */
+.cpwrap { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; background: rgba(59, 52, 44, .35); }
+.cp { width: 100%; max-width: 480px; max-height: 96vh; overflow-y: auto; padding: 18px 18px calc(10px + env(safe-area-inset-bottom)); color: var(--ink); background: #fffdf5; border: 1.5px solid var(--ink); border-bottom: 0; border-radius: 22px 22px 0 0; }
+.cp button { font: inherit; color: inherit; cursor: pointer; }
+.cptabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.cptabs button { padding: 9px 0; background: #f6f3ea; border: 1.5px solid transparent; border-radius: 999px; color: #8a7f70; }
+.cptabs button.on { background: #ffd0dc; border-color: var(--ink); color: var(--ink); }
+.cpstd { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 4px 2px 6px; justify-items: center; }
+.cpsw { width: 46px; height: 46px; padding: 0; background: var(--c, #f1eee4); border: 1.5px solid rgba(59, 52, 44, .35); border-radius: 50%; }
+.cpsw.on { border: 3px solid var(--ink); box-shadow: 0 0 0 3px #fff inset; }
+.cpsw.none { border-style: dashed; cursor: default; }
+.cpfield { position: relative; height: 210px; border: 1.5px solid var(--ink); border-radius: 10px; touch-action: none; cursor: crosshair;
+  background: linear-gradient(to bottom, #fff, rgba(255, 255, 255, 0)), linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
+.cpdot { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border: 2.5px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--ink); pointer-events: none; }
+.cpval { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.cprange { flex: 1; height: 22px; margin: 0; -webkit-appearance: none; appearance: none; background: linear-gradient(to right, #000, var(--c, #fff)); border: 1.5px solid var(--ink); border-radius: 999px; }
+.cprange::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #fff; border: 2px solid var(--ink); border-radius: 50%; }
+.cprange::-moz-range-thumb { width: 16px; height: 16px; background: #fff; border: 2px solid var(--ink); border-radius: 50%; }
+.cppct { width: 48px; text-align: right; font-size: 14px; }
+.cpinfo { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding-bottom: 14px; border-bottom: 1.5px dashed rgba(59, 52, 44, .35); font-size: 12.5px; color: #8a7f70; text-align: center; }
+.cpinfo .cpnow { flex: 0 0 58px; height: 38px; border: 1.5px solid var(--ink); border-radius: 12px; }
+.cpinfo label, .cpinfo span { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.cpinfo label { flex: 1.6; }
+.cpinfo b, .cphex { font-size: 15px; font-weight: 400; color: var(--ink); }
+.cphex { width: 100%; padding: 2px 0; font-family: inherit; text-align: center; background: #fff; border: 1.5px solid rgba(59, 52, 44, .35); border-radius: 8px; }
+.cprecent { display: flex; justify-content: space-between; margin: 14px 0 8px; }
+.cpeye { background: #fff; font-size: 20px; }
+.cpbtns { display: grid; grid-template-columns: 1fr 1fr; }
+.cpbtns button { padding: 14px 0; font-size: 16px; background: none; border: 0; }
+.cpbtns .cpok { border-left: 1.5px dashed rgba(59, 52, 44, .35); }
+.coverrow { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; }
+.coverrow .cpsw { flex: 0 0 46px; }
+.coverrow button.txt { padding: 8px 14px; font: inherit; color: inherit; background: #fff; border: 1.5px solid var(--ink); border-radius: 999px; cursor: pointer; }

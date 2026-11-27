@@ -19,7 +19,8 @@ function bookGeom(stage) {
   const y = 150 - h;
   return { x: 100 - w / 2, y, w, h, fx: 105, fy: y + h * .5 + Math.min(46, h * .42) / 2 - 8, k: .85 };
 }
-function growSvg(stage, worn = []) {
+// cover: 직접 고른 표지 색(없으면 단계별 기본 색)
+function growSvg(stage, worn = [], cover = '') {
   const ink = '#3b342c';
   const B = bookGeom(stage), has = id => worn.includes(id), top = B.y, cx = B.x + B.w / 2;
   const back = has('wings') ? `
@@ -39,19 +40,19 @@ function growSvg(stage, worn = []) {
     <ellipse cx="${cx - 19 * k}" cy="${cy + 7 * k}" rx="${4 * k}" ry="${2.6 * k}" fill="#ffb3c4"/><ellipse cx="${cx + 19 * k}" cy="${cy + 7 * k}" rx="${4 * k}" ry="${2.6 * k}" fill="#ffb3c4"/>`;
   let art;
   if (stage === 0) {
-    art = `<path d="M66 70l66-6 6 78-70 6z" fill="#fffdf2" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
+    art = `<path d="M66 70l66-6 6 78-70 6z" fill="${cover || '#fffdf2'}" stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"/>
       <path d="M118 65l14-1 1 14z" fill="#f1eee4" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
       <path d="M80 84h34M80 94h24" stroke="#cfc8b8" stroke-width="3" stroke-linecap="round"/>${face(101, 116, .9)}`;
   } else {
     // 책 크기와 두께
     const w = [0, 74, 84, 90, 98, 104, 110][stage], h = [0, 86, 98, 106, 114, 120, 126][stage], t = [0, 6, 10, 12, 18, 20, 22][stage];
-    const x = 100 - w / 2, y = 150 - h, cover = ['', '#bfd9f2', '#b98a5e', '#b98a5e', '#8a5a3c', '#8a5a3c', '#6d3f2a'][stage];
+    const x = 100 - w / 2, y = 150 - h, base = ['', '#bfd9f2', '#b98a5e', '#b98a5e', '#8a5a3c', '#8a5a3c', '#6d3f2a'][stage];
     const edge = stage >= 5 ? '#f5cf5a' : '#fffdf2';
     art = `
       ${stage === 6 ? [[100, y - 26, 0], [52, y - 6, -40], [148, y - 6, 40], [30, y + 34, -75], [170, y + 34, 75]].map(([sx, sy, r]) => `<path d="M${sx} ${sy - 9}v18" transform="rotate(${r} ${sx} ${sy})" stroke="#f5b942" stroke-width="4" stroke-linecap="round"/>`).join('') : ''}
       <path d="M${x + t} ${y + t}h${w}v${h - t}h-${w}z" fill="${edge}" stroke="${ink}" stroke-width="2.2" stroke-linejoin="round" transform="translate(0 0)"/>
       ${Array.from({ length: Math.max(1, Math.round(t / 4)) }, (_, i) => `<path d="M${x + w + 2 + i * 4} ${y + 6 + i * 4}v${h - 8}" stroke="${stage >= 5 ? '#d9a93a' : '#cfc8b8'}" stroke-width="1.5"/>`).join('')}
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="${cover}" stroke="${ink}" stroke-width="2.4"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="${cover || base}" stroke="${ink}" stroke-width="2.4"/>
       <path d="M${x + 11} ${y + 2}v${h - 4}" stroke="${ink}" stroke-width="2" opacity=".55"/>
       ${stage >= 2 ? `<path d="M${100 + 5} ${y + 14}v22M${100 - 4} ${y + 21}h18" stroke="${stage >= 5 ? '#f5cf5a' : '#fff3d6'}" stroke-width="4.5" stroke-linecap="round"/>` : `<path d="M${x + 24} ${y + 20}h${w - 38}M${x + 24} ${y + 30}h${w - 50}" stroke="#fffdf2" stroke-width="3.5" stroke-linecap="round"/>`}
       ${stage >= 3 ? `<path d="M${x + w - 20} ${y + h - 2}v20l5-5 5 5v-20" fill="#e2557a" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>` : ''}
@@ -215,7 +216,7 @@ function decoBg(id, on = [], box = null) {
 // 커플 정보에 저장하고, 서버에서 못 읽으면 이 기기에 기억해 둔 것을 쓴다.
 let decoState = null;
 const decoList = v => (Array.isArray(v) ? v.filter(x => typeof x === 'string') : []);
-const cleanDeco = d => ({ bg: d?.bg || 'eden', items: decoList(d?.items), props: decoList(d?.props), owned: decoList(d?.owned) });
+const cleanDeco = d => ({ cover: /^#[0-9a-f]{6}$/i.test(d?.cover || '') ? d.cover : '', bg: d?.bg || 'eden', items: decoList(d?.items), props: decoList(d?.props), owned: decoList(d?.owned) });
 async function fetchDeco() {
   const r = await sb.from('couples').select('deco').eq('id', state.couple.id).maybeSingle().then(x => x, () => ({ error: true }));
   return !r.error && r.data ? cleanDeco(r.data.deco) : null;
@@ -248,7 +249,7 @@ const decoWallet = g => Math.max(0, g.us - decoSpent());   // 쓸 수 있는 점
 function wornNow() {
   const d = decoState || cleanDeco(null);
   const bg = isOwned(d.bg) && DECO_THEMES.some(t => t.id === d.bg) ? d.bg : 'eden';
-  return { bg, props: d.props.filter(isOwned), items: d.items.filter(id => isOwned(id) && DECO_ITEMS.some(x => x.id === id)) };
+  return { bg, cover: d.cover, props: d.props.filter(isOwned), items: d.items.filter(id => isOwned(id) && DECO_ITEMS.some(x => x.id === id)) };
 }
 // 쓰기/빼기. 테마는 바꿔 깔고, 소품과 아이템은 켰다 껐다 한다. 같은 자리 아이템은 바꿔 낀다.
 function applyDeco(id, on) {
@@ -311,7 +312,7 @@ function growWidget(g) {
         ${decoBg(wornNow().bg, wornNow().props)}
         <a class="petshop" href="#/shop">🛍 꾸미기</a>
         <div class="petbubble" hidden></div>
-        <button class="petchar" type="button" aria-label="성경책 쓰다듬기"><span class="petflip">${growSvg(g.stage, wornNow().items)}</span></button>
+        <button class="petchar" type="button" aria-label="성경책 쓰다듬기"><span class="petflip">${growSvg(g.stage, wornNow().items, wornNow().cover)}</span></button>
       </div>
       <a class="petinfo seedinfo" href="#/grow" aria-label="성경책 키우기 자세히">
         <small>우리 성경책 · ${g.stage + 1}단계</small><b>${GROW_STAGES[g.stage].name}</b>${growBar(g)}
@@ -427,7 +428,11 @@ async function renderShop(param) {
         <div class="dgrid">${DECO_THEMES.filter(t => isOwned(t.id)).map(t => wear(t.id, decoBg(t.id, decoState.props.filter(isOwned)), worn.bg === t.id, t.name)).join('')}</div>
         <h2 class="hmark green">${th.name} 소품</h2>
         ${myProps.length ? `<div class="dgrid">${myProps.map(p => wear(th.id + '.' + p.id, decoBg(th.id, [th.id + '.' + p.id], p.box), worn.props.includes(th.id + '.' + p.id))).join('')}</div>` : empty('이 테마의 소품이 아직 없어요.')}
-        <h2 class="hmark">성경책 아이템</h2>
+        <h2 class="hmark">표지 색</h2>
+        <div class="coverrow"><button class="cpsw" id="coverPick" style="--c:${worn.cover || '#f1eee4'}" aria-label="표지 색 고르기"></button>
+          <button class="txt" id="coverPick2">🎨 색 고르기</button>${worn.cover ? '<button class="txt" id="coverReset">기본 색으로</button>' : ''}</div>
+        <p class="hint">${worn.cover ? '고른 색이 표지에 칠해져 있어요.' : '지금은 자라는 단계에 맞는 기본 색이에요.'}</p>
+        <h2 class="hmark green">성경책 아이템</h2>
         ${myItems.length ? `<div class="dgrid">${myItems.map(x => wear(x.id, emoji(x), worn.items.includes(x.id))).join('')}</div>` : empty('아직 산 아이템이 없어요.')}
         <p class="hint">모자처럼 같은 자리에 쓰는 아이템은 하나만 걸칠 수 있어요. 고른 모습은 두 사람에게 똑같이 보여요.</p>`;
     }
@@ -448,6 +453,13 @@ async function renderShop(param) {
       const err = await buyDeco(x.id, g);
       if (location.hash === here) redraw(err || `‘${x.name}’ 구매 완료! 바로 적용했어요. 옷장에서 빼거나 바꿀 수 있어요.`, !err);
     }; });
+    const setCover = async c => {
+      decoState.cover = c; redraw('');
+      if (!(await saveDeco()) && location.hash === here) document.getElementById('dMsg').textContent = '이 휴대폰에만 반영됐어요. 인터넷 연결을 확인해 주세요.';
+    };
+    view.querySelectorAll('#coverPick, #coverPick2').forEach(b => { b.onclick = () => openColorPicker({ value: worn.cover || '#b98a5e', onDone: setCover }); });
+    const reset = document.getElementById('coverReset');
+    if (reset) reset.onclick = () => setCover('');
     view.querySelectorAll('[data-wear]').forEach(b => { b.onclick = async () => {
       const id = b.dataset.wear, x = goodOf(id);
       applyDeco(id, x.kind === 'bg' ? true : b.getAttribute('aria-pressed') !== 'true');
