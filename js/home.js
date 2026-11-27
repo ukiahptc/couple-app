@@ -73,6 +73,9 @@ function renderHome() {
         ${shot && aurls[shot.thumb] ? `<a class="hpol" href="#/album" aria-label="사진 앨범"><img src="${esc(aurls[shot.thumb])}" alt=""><span>${esc(shot.caption || ago(shot.taken_date))}</span></a>` : ''}
       </div>
 
+      <h2 class="hmark green">오늘의 말씀</h2>
+      <button class="hverse" id="hverse" hidden></button>
+
       <h2 class="hmark">다가오는 일정</h2>
       ${coming.length ? coming.map(({ x, d, n }) => row('#/calendar',
           `<i class="odot ${x.key}"></i>${n === 0 ? '오늘' : n === 1 ? '내일' : `${d.getMonth() + 1}월 ${d.getDate()}일(${WEEK[d.getDay()]})`} · ${esc(x.title)}`,
@@ -83,6 +86,7 @@ function renderHome() {
         ${[['calendar', '📅', '캘린더'], ['diary', '📔', '일기'], ['food', '🍴', '맛집'], ['money', '💳', '가계부'], ['map', '🗺️', '지도'], ['album', '📷', '앨범']]
           .map(([id, e, n]) => `<a href="#/${id}"><b aria-hidden="true">${e}</b>${n}</a>`).join('')}
       </nav>`;
+    fillVerse(document.getElementById('hverse'));
     const r = document.getElementById('refreshBtn');
     if (r) r.onclick = start;
   };
