@@ -45,7 +45,7 @@ function renderHome() {
   const P = id => PAGES.find(p => p.id === id);
   const sd = state.couple.start_date, t = today0();
 
-  const draw = ({ anns = [], events = [], diaries = [], money = null } = {}) => {
+  const draw = ({ anns = [], events = [], diaries = [], money = null, places = [], purls = {} } = {}) => {
     view.innerHTML = `
       ${!partner ? `
       <section class="invite">
@@ -64,7 +64,9 @@ function renderHome() {
           ${miniCalendar(marksThisMonth(anns, events))}
         </div>`)}
 
-      ${widget(P('food'), '#fecdd3', '<div class="wempty">아직 남긴 맛집이 없어요</div>')}
+      ${widget(P('food'), '#fecdd3', places.length ? `<div class="wfood">${places.map(p => `
+        <div class="wplace"><span class="fphoto">${purls[p.photos[0]] ? `<img src="${esc(purls[p.photos[0]])}" alt="">` : `<span class="fnone">${foodEmoji(p.category)}</span>`}</span>
+          <b>${esc(p.name)}</b></div>`).join('')}</div>` : '<div class="wempty">아직 남긴 맛집이 없어요</div>')}
 
       ${widget(P('diary'), '#bbf7d0', diaries.length ? diaries.map(r => {
         const d = parseDate(r.entry_date), ago = diffDays(t, d);
@@ -89,9 +91,12 @@ function renderHome() {
     sb.from('diaries').select('author_id, title, body, entry_date, entry_time')
       .order('entry_date', { ascending: false }).order('entry_time', { ascending: false }).limit(2),
     sb.from('money_dates').select('start_date, money_expenses(amount)'),
-  ]).then(([an, ev, di, mo]) => {
+    sb.from('places').select('name, category, photos').order('visit_date', { ascending: false }).order('created_at', { ascending: false }).limit(3),
+  ]).then(async ([an, ev, di, mo, pl]) => {
+    const places = pl.data || [];
+    const purls = await photoUrls(places.map(p => p.photos[0]).filter(Boolean)).catch(() => ({}));
     const onHome = ['', '#', '#/'].includes(location.hash);
     // 받아 온 내용으로 달력 표시와 최근 일기를 채운다
-    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null });
+    if (onHome) draw({ anns: an.data || [], events: ev.data || [], diaries: di.data || [], money: mo.data?.length ? mo.data : null, places, purls });
   });
 }

@@ -29,7 +29,7 @@ const PAGES = [
   { id: 'dday',     name: '디데이',     icon: 'heart',    stage: 2, render: () => renderDday() },
   { id: 'calendar', name: '커플 캘린더', icon: 'calendar', stage: 2, render: () => renderCalendar() },
   { id: 'diary',    name: '커플 일기장', icon: 'diary',    stage: 2, render: param => renderDiary(param) },
-  { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3 },
+  { id: 'food',     name: '맛집 기록장', icon: 'food',     stage: 3, render: param => renderFood(param) },
   { id: 'money',    name: '데이트 가계부', icon: 'money',  stage: 3, render: param => renderMoney(param) },
   { id: 'map',      name: '데이트 지도', icon: 'map',      stage: 3 },
   { id: 'album',    name: '사진 앨범',   icon: 'album',    stage: 4 },
