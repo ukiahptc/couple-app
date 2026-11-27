@@ -1,5 +1,5 @@
 // 파일을 수정해 배포할 때마다 이 버전 숫자를 올리면 새 파일이 적용된다.
-const CACHE = 'couple-app-v42';
+const CACHE = 'couple-app-v43';
 // 글꼴은 바뀌지 않으므로 따로 보관하고, 한 번 받으면 계속 그것을 쓴다.
 const FONT_CACHE = 'couple-app-fonts-v1';
 const FONTS = ['fonts/gaegu-400.woff2', 'fonts/gaegu-700.woff2', 'fonts/gowun-dodum-400.woff2'];

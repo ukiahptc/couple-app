@@ -812,7 +812,8 @@ body.paper { font-synthesis: none; }
 body.paper .tabbar { background: var(--paper); border-top: 2px solid var(--ink); }
 body.paper .tabbar a { gap: 0; font-family: var(--font-heading); font-size: 17px; color: #8a7f70; }
 .tabbar a b { font-size: 21px; font-weight: 400; line-height: 1.2; font-family: "Apple Color Emoji", "Noto Color Emoji", sans-serif; filter: grayscale(1); opacity: .6; }
-body.paper .tabbar a[aria-current="page"] { color: var(--ink); font-weight: 700; background: linear-gradient(transparent 62%, var(--theme) 62%, var(--theme) 88%, transparent 88%); }
+body.paper .tabbar a[aria-current="page"] { color: var(--ink); font-weight: 700; background: none; box-shadow: inset 0 -4px 0 var(--theme-deep); }
+body.paper .tabbar a { padding-bottom: 8px; }
 .tabbar a[aria-current="page"] b { filter: none; opacity: 1; }
 body.hastabs main { padding-bottom: calc(env(safe-area-inset-bottom) + var(--tab-h) + var(--space-xl)); }
 body.hastabs .bottombar { bottom: calc(env(safe-area-inset-bottom) + var(--tab-h)); padding-bottom: var(--space-sm); }
