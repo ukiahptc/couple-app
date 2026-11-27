@@ -70,7 +70,7 @@ function growSvg(stage, worn = []) {
 }
 
 // 무엇이 몇 점인지. [표 이름, 이름, 점수]. 믿음 점수는 성경책을 키우고, 우리 점수는 꾸미기를 연다.
-const FAITH_RULES = [['qt_answers', '질문 답', 1], ['qt_shares', 'QT 나눔', 3], ['qt_share_comments', '나눔 댓글', 1], ['bible_reads', '통독(장)', 1]];
+const FAITH_RULES = [['qt_answers', '질문 답', 1], ['qt_shares', 'QT 나눔', 3], ['qt_share_comments', '나눔 댓글', 1], ['bible_reads', '통독(장)', 1], ['thanks', '감사 쪽지', 1]];
 const US_RULES = [['diaries', '일기', 2], ['diary_comments', '일기 댓글', 1], ['events', '일정', 1], ['places', '맛집', 2], ['trips', '데이트 지도', 2], ['album_photos', '사진', 1], ['money_dates', '가계부 데이트', 1]];
 const BOTH_BONUS = 3;   // 그날 질문에 둘 다 답하면 더 받는 점수
 let growCache = null;   // 마지막으로 센 결과. 화면을 바로 그릴 때 쓴다.

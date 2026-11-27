@@ -36,6 +36,7 @@ const PAGES = [
   { id: 'bible',    name: '성경 통독표', icon: 'records',  stage: 5, render: param => renderBible(param), tab: 'faith' },
   { id: 'qt',       name: 'QT 나눔',    icon: 'diary',    stage: 5, render: param => renderQt(param), tab: 'faith' },
   { id: 'ask',      name: '오늘의 질문', icon: 'comment',  stage: 5, render: () => renderAsk(), tab: 'faith' },
+  { id: 'thanks',   name: '감사 일기',  icon: 'heart',    stage: 5, render: param => renderThanks(param), tab: 'faith' },
   { id: 'grow',     name: '성경책 키우기', icon: 'records', stage: 5, render: () => renderGrow(), tab: 'faith' },
   { id: 'us',       name: '우리',       icon: 'heart',    tab: 'us',    render: () => renderUsHub() },
   { id: 'faith',    name: '믿음',       icon: 'records',  tab: 'faith', render: () => renderFaithHub() },
@@ -99,23 +100,25 @@ function renderUsHub() {
 async function renderFaithHub() {
   setHeader('믿음');
   const today = toISO(today0());
-  const draw = (asked, read) => {
+  const draw = (asked, read, thanked) => {
     view.innerHTML = `
       <div id="fgrow"></div>
       <h2 class="hmark green">오늘</h2>
       <a class="hli" href="#/ask"><span>${asked == null ? '💬 오늘의 질문' : asked ? '✅ 오늘의 질문에 답했어요' : '💬 오늘의 질문에 아직 답하지 않았어요'}</span><small>›</small></a>
       <a class="hli" href="#/bible"><span>${read == null ? '📖 성경 통독' : read ? `✅ 오늘 ${read}장 읽었어요` : '📖 오늘은 아직 읽지 않았어요'}</span><small>›</small></a>
-      ${stickers([['ask', '💬', '질문'], ['qt', '🕊️', 'QT'], ['bible', '📖', '통독'], ['grow', '⭐', '성경책']])}`;
+      <a class="hli" href="#/thanks"><span>${thanked == null ? '🫙 감사 쪽지' : thanked ? `✅ 오늘 감사 쪽지 ${thanked}장을 넣었어요` : '🫙 오늘의 감사를 아직 적지 않았어요'}</span><small>›</small></a>
+      ${stickers([['ask', '💬', '질문'], ['qt', '🕊️', 'QT'], ['bible', '📖', '통독'], ['thanks', '🫙', '감사']])}`;
     mountPet(document.getElementById('fgrow'), growCache);
   };
-  draw(null, null);
+  draw(null, null, null);
   const n = q => q.then(r => (r.error ? null : r.count || 0), () => null);
-  const [asked, read] = await Promise.all([
+  const [asked, read, thanked] = await Promise.all([
     n(sb.from('qt_answers').select('id', { count: 'exact', head: true }).eq('q_date', today).eq('user_id', state.user.id)),
     n(sb.from('bible_reads').select('id', { count: 'exact', head: true }).eq('read_date', today).eq('user_id', state.user.id)),
+    n(sb.from('thanks').select('id', { count: 'exact', head: true }).eq('thank_date', today).eq('user_id', state.user.id)),
     growPoints(),
   ]);
-  if (location.hash === '#/faith') draw(asked, read);
+  if (location.hash === '#/faith') draw(asked, read, thanked);
 }
 
 const BRAND = `
