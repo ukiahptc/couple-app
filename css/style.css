@@ -700,3 +700,14 @@ body.paper input, body.paper textarea, body.paper select, body.paper button { fo
 .hero .num { font-weight: 700; } .hero .since { border-top: 1.5px dashed rgba(59, 52, 44, .35); }
 .drow .dleft { font-weight: 700; } .drow .dleft.now { background: #ffd9e2; color: var(--ink); }
 .fgrid { padding: 0 4px; }
+
+/* ── 글자 깨짐 방지 ──
+   고운돋움은 굵기가 하나뿐이라 기기가 억지로 굵게 그리면 번져 보인다. 억지 굵게를 끄고,
+   강조는 손글씨체(굵은 글자가 실제로 있음)와 색으로 한다. */
+body.paper { font-synthesis: none; }
+.nohw { font-family: var(--font-body) !important; letter-spacing: 0; }
+.sheetbody .plaintitle { font-family: var(--font-body); font-size: 22px; }   /* 입력 중에는 글꼴이 섞이지 않게 */
+.mamt, .mtotal b, .fstar, .mapstat b, .evtime, .stamp b, .todaytile b, .cell .num, .acount, .fcount { font-family: var(--font-heading); font-weight: 700; }
+.mamt { font-size: 21px; } .mamt small { font-family: var(--font-body); }
+.cell .num { font-size: 18px; }
+.mcard b, .mrow b, .fname b, .triphead b, .dhead b, .evtitle, .hstk a, .drow .t { font-size: 17px; }

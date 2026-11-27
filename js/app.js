@@ -243,6 +243,19 @@ async function logout() {
 }
 menuBtn.addEventListener('click', logout);
 window.addEventListener('hashchange', route);
+
+// 손글씨체로 보이는 줄에 Gaegu 에 없는 한글이 섞이면 그 글자만 다른 글꼴로 바뀌어 깨져 보인다.
+// 그런 줄은 통째로 본문 글꼴(nohw)로 바꾼다. 화면이 바뀔 때마다 다시 살핀다.
+const HW_SPOTS = '#pageTitle, .hli span, .hli small, .hpol span, .hnote p, .hnote b, .mtitle2 h2, .fdetail h2, .dfull h2, .tripwhere b, .reghead h2, .sheethead b, .mmonth, .daytitle, .btn.wide';
+function fixHandwriting() {
+  document.querySelectorAll(HW_SPOTS).forEach(el => {
+    const bad = [...el.textContent].some(c => c >= '\uac00' && c <= '\ud7a3' && !GAEGU_HANGUL.has(c));
+    el.classList.toggle('nohw', bad);
+  });
+}
+let hwTimer = 0;
+new MutationObserver(() => { clearTimeout(hwTimer); hwTimer = setTimeout(fixHandwriting, 0); })
+  .observe(document.body, { childList: true, subtree: true, characterData: true });
 // 인터넷이 끊기면 위에 안내 띠를 보여 주고, 다시 연결되면 지금 화면을 새로 불러온다
 const offlineBar = document.getElementById('offline');
 const syncOnline = () => { offlineBar.hidden = navigator.onLine; };
